@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glow Bar — Mocktail Recipe Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FF2D78;
+    --magenta: #FF00AA;
+    --coral: #FF6B6B;
+    --peach: #FFAA85;
+    --bg: #0A0A0F;
+    --rich: #111118;
+    --card: #16161F;
+    --border: rgba(255,255,255,0.08);
+    --white: #F5F0EB;
+    --grey: #6B6B7B;
+    --glass: rgba(255,255,255,0.05);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--white); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+  /* HERO */
+  .hero { text-align:center; padding:4rem 1.5rem 3rem; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:600px; height:400px; background:radial-gradient(ellipse,rgba(255,45,120,0.12) 0%,transparent 70%); pointer-events:none; }
+  .hero-label { font-size:0.65rem; letter-spacing:5px; text-transform:uppercase; color:var(--pink); font-weight:500; margin-bottom:1rem; }
+  .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(3.5rem,12vw,7rem); letter-spacing:6px; color:var(--white); line-height:0.95; }
+  .hero-title span { color:var(--pink); }
+  .hero-sub { font-family:'Playfair Display',serif; font-style:italic; font-size:1.1rem; color:var(--grey); margin-top:0.8rem; }
+  .hero-line { width:60px; height:1px; background:var(--pink); margin:1.5rem auto 0; opacity:0.4; }
+
+  /* CONTROLS */
+  .controls { max-width:1100px; margin:0 auto; padding:2rem 1.5rem 0; }
+  .search-wrap { margin-bottom:1rem; }
+  .search-input { width:100%; max-width:500px; display:block; margin:0 auto; padding:0.75rem 1.5rem; border-radius:50px; border:1px solid var(--border); background:var(--glass); color:var(--white); font-family:'Outfit',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.2s; }
+  .search-input::placeholder { color:var(--grey); }
+  .search-input:focus { border-color:rgba(255,45,120,0.5); }
+  .filters { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .flt { font-family:'Outfit',sans-serif; font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; padding:0.5rem 1.2rem; border-radius:50px; border:1px solid var(--border); background:transparent; color:var(--grey); cursor:pointer; font-weight:500; transition:all 0.2s; }
+  .flt:hover { border-color:rgba(255,45,120,0.5); color:var(--white); }
+  .flt.active { background:var(--pink); border-color:var(--pink); color:#fff; }
+
+  /* GRID */
+  .grid { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.2rem; padding:1.5rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; cursor:pointer; transition:all 0.3s ease; }
+  .card:hover { border-color:rgba(255,45,120,0.4); transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+  .card-top { padding:1.5rem 1.5rem 1rem; }
+  .tag { display:inline-block; font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; padding:0.3rem 0.9rem; border-radius:20px; margin-bottom:0.8rem; font-weight:500; }
+  .tag-sig { background:rgba(255,45,120,0.15); color:var(--pink); border:1px solid rgba(255,45,120,0.3); }
+  .tag-trop { background:rgba(255,170,68,0.12); color:#FFAA44; border:1px solid rgba(255,170,68,0.3); }
+  .tag-mat { background:rgba(125,196,90,0.12); color:#7DC45A; border:1px solid rgba(125,196,90,0.3); }
+  .tag-des { background:rgba(255,170,133,0.12); color:var(--peach); border:1px solid rgba(255,170,133,0.3); }
+  .tag-ene { background:rgba(255,107,107,0.12); color:var(--coral); border:1px solid rgba(255,107,107,0.3); }
+  .card-name { font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--white); margin-bottom:0.4rem; }
+  .card-desc { font-size:0.83rem; color:var(--grey); line-height:1.6; }
+  .card-foot { padding:0.9rem 1.5rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .diff-label { font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; color:var(--grey); margin-bottom:5px; }
+  .dots { display:flex; gap:5px; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--border); }
+  .dot.on { background:var(--pink); }
+  .view-btn { font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; color:var(--pink); font-weight:500; }
+
+  /* DETAIL VIEW */
+  #detailView { display:none; max-width:780px; margin:0 auto; padding:1.5rem; }
+  .back-btn { font-family:'Outfit',sans-serif; font-size:0.65rem; letter-spacing:3px; text-transform:uppercase; color:var(--pink); cursor:pointer; font-weight:500; border:none; background:transparent; padding:0; margin-bottom:1.5rem; display:inline-block; }
+  .back-btn:hover { opacity:0.7; }
+  .detail-card { background:var(--card); border:1px solid rgba(255,45,120,0.2); border-radius:20px; overflow:hidden; }
+  .detail-top { background:var(--rich); padding:2.5rem 2rem 2rem; position:relative; border-bottom:1px solid var(--border); }
+  .detail-top::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,var(--pink),transparent); }
+  .detail-name { font-family:'Playfair Display',serif; font-size:2rem; color:var(--white); margin:0.8rem 0 0.4rem; }
+  .detail-tagline { font-family:'Playfair Display',serif; font-style:italic; font-size:1rem; color:var(--grey); }
+  .detail-body { padding:2rem; }
+  .sec-head { font-family:'Bebas Neue',sans-serif; font-size:0.85rem; letter-spacing:4px; color:var(--pink); margin:1.8rem 0 0.8rem; }
+  .sec-head:first-child { margin-top:0; }
+  .ings { display:flex; flex-direction:column; gap:6px; }
+  .ing { display:flex; align-items:center; gap:10px; font-size:0.9rem; color:var(--white); padding:0.6rem 1rem; background:var(--glass); border-radius:10px; border:1px solid var(--border); }
+  .ing-dot { width:6px; height:6px; border-radius:50%; background:var(--pink); flex-shrink:0; }
+  .steps { display:flex; flex-direction:column; gap:1rem; }
+  .step { display:flex; gap:1rem; align-items:flex-start; }
+  .step-num { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--pink); min-width:24px; line-height:1.4; }
+  .step-text { font-size:0.9rem; line-height:1.75; color:var(--white); padding-top:2px; }
+  .step-text em { color:var(--peach); font-style:normal; font-weight:500; }
+  .gs-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .gs-box { background:var(--glass); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem; }
+  .gs-label { font-size:0.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--grey); margin-bottom:0.4rem; font-weight:500; }
+  .gs-val { font-size:0.88rem; color:var(--white); line-height:1.5; }
+  .tip-box { background:rgba(255,45,120,0.06); border:1px solid rgba(255,45,120,0.25); border-radius:12px; padding:1.2rem 1.5rem; margin-top:1.2rem; }
+  .tip-label { font-size:0.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--pink); font-weight:600; margin-bottom:0.5rem; }
+  .tip-text { font-size:0.88rem; color:var(--grey); line-height:1.75; }
+  .empty { text-align:center; padding:4rem 2rem; color:var(--grey); font-style:italic; }
+
+  /* FOOTER */
+  .footer { text-align:center; padding:4rem 2rem 3rem; }
+  .footer::before { content:''; display:block; width:60px; height:1px; background:var(--pink); margin:0 auto 2rem; opacity:0.3; }
+  .footer-logo { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:4px; color:var(--pink); }
+  .footer-text { margin-top:0.5rem; font-size:0.7rem; color:var(--grey); letter-spacing:1px; }
+
+  @media(max-width:600px) {
+    .gs-row { grid-template-columns:1fr; }
+    .detail-top { padding:2rem 1.5rem 1.5rem; }
+    .detail-body { padding:1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">Mixologist's Complete Guide</div>
+  <div class="hero-title">GLOW<span>BAR</span></div>
+  <div class="hero-sub">step-by-step recipes for every occasion</div>
+  <div class="hero-line"></div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <input class="search-input" type="text" id="searchInput" placeholder="Search drinks..." oninput="doFilter()">
+  </div>
+  <div class="filters">
+    <button class="flt active" onclick="setCat('all',this)">All Drinks</button>
+    <button class="flt" onclick="setCat('sig',this)">Signature</button>
+    <button class="flt" onclick="setCat('trop',this)">Tropical</button>
+    <button class="flt" onclick="setCat('mat',this)">Matcha</button>
+    <button class="flt" onclick="setCat('des',this)">Dessert</button>
+    <button class="flt" onclick="setCat('ene',this)">Energy</button>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div id="detailView">
+  <button class="back-btn" onclick="goBack()">← Back to all drinks</button>
+  <div class="detail-card" id="detailCard"></div>
+</div>
+
+<div class="footer">
+  <div class="footer-logo">GLOW BAR</div>
+  <div class="footer-text">Mocktail Recipe Guide — 2026</div>
+</div>
+
+<script>
+const drinks = [
+  {
+    name:"Bangkok Sunset", tagline:"The colour-changing showstopper", cat:"sig", diff:2,
+    glitter:"Violet glitter on the rim", spice:"Cardamom dust on top",
+    ings:["60ml Monin Lychee syrup","30ml Monin Watermelon syrup","2–3 canned lychees + splash of tin syrup","Schweppes Soda Water to top","30ml Monin Butterfly Pea syrup (add LAST)","Crushed ice","Violet edible glitter for rim","Cardamom — tiny pinch"],
+    steps:[
+      {t:"Fill a tall glass all the way to the top with <em>crushed ice</em>. The more ice the better — it keeps the layers intact and slows mixing."},
+      {t:"Pour in the <em>60ml Lychee syrup</em>. One standard shot glass = 30ml, so that's two shots."},
+      {t:"Add the <em>30ml Watermelon syrup</em>."},
+      {t:"Drop in <em>2–3 lychees</em> from the can, plus a small splash of their syrup. They will sink to the bottom and look beautiful through the glass."},
+      {t:"Gently top with <em>soda water</em> — pour it slowly over the back of a spoon held just above the ice to keep the layers."},
+      {t:"<em>The magic moment:</em> very slowly pour the <em>30ml Butterfly Pea syrup</em> down the inside edge of the glass. Watch it bleed from purple to pink as it hits the acidic lychee. Film this!"},
+      {t:"Prepare the rim: rub a lemon wedge around the top of the glass, then dip it into <em>Violet glitter</em> mixed with a pinch of sugar on a small plate. The sugar helps the glitter stick."},
+      {t:"Dust a tiny pinch of <em>cardamom</em> over the top. Serve immediately — do NOT stir."}
+    ],
+    tip:"The colour change only works if butterfly pea goes in LAST and is poured slowly. If you mix it early it turns grey — the drama is entirely in the pour."
+  },
+  {
+    name:"Strawberry Rose Fizz", tagline:"Elegant, floral and pink", cat:"sig", diff:1,
+    glitter:"Baby Pink rim + Strawberry glitter float", spice:"Black pepper on strawberries before muddling",
+    ings:["4–5 fresh strawberries","20ml Monin Rose syrup","20ml Monin Pure Cane Sugar syrup","Juice of half a lemon","Schweppes Tonic Water to top","Ice","Baby Pink + Strawberry glitter","Black pepper — tiny pinch"],
+    steps:[
+      {t:"Hull the <em>4–5 strawberries</em> (remove the green tops). Place them in the bottom of your glass or shaker. Sprinkle a tiny pinch of <em>black pepper</em> over them — it sounds strange but genuinely amplifies the strawberry flavour."},
+      {t:"<em>Muddle the strawberries:</em> press and crush them firmly with the back of a spoon until they're completely broken down and releasing deep red juice."},
+      {t:"Add the <em>20ml Rose syrup</em>, <em>20ml Pure Cane Sugar</em>, and <em>juice of half a lemon</em>."},
+      {t:"If using a shaker: add ice and shake hard for 10 seconds. If building in the glass: add ice and stir gently."},
+      {t:"Strain into a fresh glass over ice to remove the strawberry pulp, or leave the pulp in — it looks beautiful either way."},
+      {t:"Rim the glass: rub lemon around the top edge, then dip into a small plate with <em>Baby Pink and Strawberry glitters</em> mixed together."},
+      {t:"Top slowly with <em>Tonic Water</em>. Float a pinch of Strawberry glitter on the surface — it will sparkle like the drink is alive."},
+      {t:"Garnish: slice a strawberry from tip to base three times, keeping the base intact, fan it out and perch it on the rim."}
+    ],
+    tip:"Tonic water's slight bitterness balances the sweetness beautifully. If you'd prefer sweeter, swap tonic for soda water."
+  },
+  {
+    name:"Tropical Kiwi Smash", tagline:"Fresh, punchy and vibrant", cat:"trop", diff:2,
+    glitter:"Apple Green rim + Sea Blue float", spice:"Ginger powder",
+    ings:["30ml Monin Kiwi fruit mix","20ml Monin Peach syrup","60ml Dimes Pineapple juice","Juice of half a lime","Handful fresh blueberries","Schweppes Soda Water to top","Ice","Apple Green + Sea Blue glitter","Ginger powder — pinch"],
+    steps:[
+      {t:"Add a <em>large handful of blueberries</em> to your cocktail shaker. Muddle them firmly with the back of a spoon until completely broken down into a deep purple liquid."},
+      {t:"Add the <em>30ml Kiwi fruit mix</em>, <em>20ml Peach syrup</em>, <em>60ml Pineapple juice</em>, and <em>juice of half a lime</em>."},
+      {t:"Add a <em>pinch of ginger powder</em> and stir through briefly."},
+      {t:"Fill the shaker with ice. Seal it and shake hard for 15 seconds."},
+      {t:"Rim your glass: rub lime around the edge and dip into <em>Apple Green glitter</em> mixed with a little sugar."},
+      {t:"<em>Double strain</em> the drink into the glass over fresh ice. Double straining means pouring through the shaker strainer AND through a fine kitchen sieve. This removes all blueberry seeds for a silky result."},
+      {t:"Top gently with <em>soda water</em>."},
+      {t:"Float a pinch of <em>Sea Blue glitter</em> on top. The green rim, blue shimmer and deep purple drink looks like a tropical ocean."}
+    ],
+    tip:"Double straining is the difference between a professional and amateur result here. The extra 30 seconds is worth it every time."
+  },
+  {
+    name:"Lychee Coconut Cloud", tagline:"Creamy, dreamy and Southeast Asian", cat:"des", diff:2,
+    glitter:"Silver White stirred through the drink", spice:"Cinnamon dusted on top",
+    ings:["45ml Monin Lychee syrup","60ml canned coconut milk","2–3 canned lychees (muddled or whole)","20ml sweetened condensed milk","Juice of half a lime","Coconut gel cubes from Chaokoh can","Crushed ice","Silver White glitter","Cinnamon — pinch"],
+    steps:[
+      {t:"Open the <em>Chaokoh coconut gel can</em>. Drain off the syrup and scoop out 5–6 gel cubes. Set these aside — they go in at the very end."},
+      {t:"Add <em>2–3 lychees</em> to your shaker and muddle until broken down. Or leave them whole and just drop them into the finished drink."},
+      {t:"Add the <em>45ml Lychee syrup</em>, <em>60ml coconut milk</em>, <em>20ml condensed milk</em>, and <em>juice of half a lime</em>."},
+      {t:"Add a generous pinch of <em>Silver White glitter</em> directly into the shaker and stir — this distributes the shimmer throughout the whole drink."},
+      {t:"Fill the shaker with ice and shake <em>very hard for 20 seconds</em>. The condensed milk needs serious shaking to emulsify into a creamy froth."},
+      {t:"Fill your serving glass with <em>crushed ice</em> all the way to the top."},
+      {t:"Drop in the <em>coconut gel cubes</em> — they will sink to the bottom like translucent pearls. They look incredible and taste amazing."},
+      {t:"Strain the shaken drink over the ice. Dust a little <em>cinnamon</em> on top. Serve with a wide straw so guests can scoop up the coconut gel as they drink."}
+    ],
+    tip:"The coconut gel cubes are your secret weapon — they're identical in appearance to premium boba pearls and the texture is extraordinary. This drink alone is worth the trip to Glow Bar."
+  },
+  {
+    name:"Blue Lagoon Energy", tagline:"Electric, glowing and colour-changing", cat:"ene", diff:1,
+    glitter:"Sea Blue glitter stirred in before Red Bull", spice:"Chilli salt rim",
+    ings:["30ml Monin Butterfly Pea syrup","20ml Monin Lychee syrup","Juice of half a lemon","1 can Red Bull","Ice","Sea Blue glitter","Salt + chilli flakes for rim"],
+    steps:[
+      {t:"<em>Prepare the rim first:</em> mix a pinch of chilli flakes with an equal amount of salt on a small plate. Rub a lemon wedge around the rim of the glass and dip it into the chilli salt. The sweet-sour-spicy rim is extraordinary with this drink."},
+      {t:"Fill the glass with <em>cubed ice</em> (not crushed — cubed looks better for this one)."},
+      {t:"Pour in the <em>30ml Butterfly Pea syrup</em>. It will be a deep, dramatic midnight blue."},
+      {t:"Add the <em>20ml Lychee syrup</em>."},
+      {t:"Stir in a pinch of <em>Sea Blue glitter</em> — the drink is already blue so this deepens and adds shimmer."},
+      {t:"<em>The colour change moment:</em> squeeze in the <em>juice of half a lemon</em>. The drink will instantly shift from blue to violet-purple as the acid reacts with the butterfly pea. Have your phone ready to film this."},
+      {t:"Very slowly pour the <em>Red Bull</em> over the back of a spoon resting on the rim. The carbonation makes the glitter swirl and dance as it pours."},
+      {t:"Serve immediately without stirring. The colour continues to evolve as it settles."}
+    ],
+    tip:"The colour change is instant — the moment lemon hits it, it goes purple. Film every single time. This is your most viral-worthy drink."
+  },
+  {
+    name:"Watermelon Tonic Spritz", tagline:"Summer in a glass", cat:"sig", diff:1,
+    glitter:"Strawberry glitter floated on top", spice:"Tajin or chilli flakes + salt rim",
+    ings:["40ml Monin Watermelon syrup","Juice of half a lime","3–4 fresh strawberries","Schweppes Tonic Water to top","Ice","Strawberry glitter","Chilli flakes + salt for rim"],
+    steps:[
+      {t:"Mix <em>chilli flakes with salt</em> on a small plate. Rub a lime wedge around the rim and dip into the spice mix. Set the glass aside."},
+      {t:"Hull and roughly chop the <em>3–4 fresh strawberries</em>. Drop them into the bottom of the glass."},
+      {t:"<em>Muddle firmly</em> with the back of a spoon until they're completely broken down into a deep red pulpy liquid."},
+      {t:"Fill the glass with <em>ice</em>."},
+      {t:"Pour in the <em>40ml Watermelon syrup</em> and <em>juice of half a lime</em>. Stir briefly with a straw."},
+      {t:"Top slowly and gently with <em>Tonic Water</em>. Slow pouring preserves the bubbles and prevents overflow."},
+      {t:"Float a generous pinch of <em>Strawberry glitter</em> on top of the foam. It catches light as though the drink is glowing."},
+      {t:"Garnish with a lime wheel. Serve without stirring so guests experience the colour evolving as they drink."}
+    ],
+    tip:"Watermelon and chilli is a legendary flavour combination from Mexican street food. The spiced rim turns this from a simple fruity drink into something truly sophisticated — don't skip it."
+  },
+  {
+    name:"Spiced Pineapple Mule", tagline:"Your mocktail Moscow Mule", cat:"trop", diff:1,
+    glitter:"Sparkle Gold stirred through the drink", spice:"Ground ginger + turmeric dusted on top",
+    ings:["60ml Spiced Pineapple drink","20ml Monin Peach syrup","Juice of half a lime","Schweppes Soda Water to top","Ice","Sparkle Gold glitter","Ground ginger — pinch","Ground turmeric — tiny pinch"],
+    steps:[
+      {t:"Fill a tall glass (or copper mug if you have one) with <em>ice</em> — pack it right to the top."},
+      {t:"Pour in the <em>60ml Spiced Pineapple drink</em>."},
+      {t:"Add the <em>20ml Peach syrup</em> and squeeze in the <em>juice of half a lime</em>."},
+      {t:"Stir in a small pinch of <em>Sparkle Gold glitter</em>. The gold shimmering through the yellow-orange drink looks stunning."},
+      {t:"Top slowly with <em>soda water</em> poured over the back of a spoon to preserve the bubbles."},
+      {t:"On a small spoon, mix a tiny pinch each of <em>ground ginger and ground turmeric</em> together."},
+      {t:"Dust the spice mix gently across the top of the drink. It will float on the surface, adding a warm golden colour and exotic aroma."},
+      {t:"Garnish with a lime wedge on the rim. The drink should be deep gold, glittering and warmly spiced."}
+    ],
+    tip:"Be very conservative with the turmeric — a tiny pinch adds colour and warmth, too much tastes medicinal. Less is always more with turmeric."
+  },
+  {
+    name:"Mango Passion Tango", tagline:"Tropical, vibrant and addictive", cat:"trop", diff:1,
+    glitter:"Sparkle Gold + Strawberry mixed on the rim", spice:"Chilli powder + salt rim",
+    ings:["80ml Dimes Mango juice","30ml Passion fruit drink","20ml Monin Watermelon syrup","Juice of half a lime","Schweppes Soda Water to top","Ice","Sparkle Gold + Strawberry glitter","Chilli powder + salt for rim"],
+    steps:[
+      {t:"Mix <em>chilli powder with salt</em> in equal amounts on a small plate. Rub a lime wedge around the rim and dip in. The mango-chilli rim is spectacular."},
+      {t:"Fill your glass with <em>ice</em>."},
+      {t:"Pour in the <em>80ml Mango juice</em>."},
+      {t:"Add the <em>30ml Passion fruit drink</em> and <em>20ml Watermelon syrup</em>."},
+      {t:"Squeeze in the <em>juice of half a lime</em>. Stir everything gently just once."},
+      {t:"Mix <em>Sparkle Gold and Strawberry glitters</em> together on a small plate. Dip a slightly damp finger into the glitter mix and gently draw it around the inside top edge of the glass — creates a glittering sunset effect visible from outside."},
+      {t:"Top with <em>soda water</em> poured slowly over the back of a spoon."},
+      {t:"The drink should be deep orange-red with gold shimmer throughout. Serve with a lime wheel."}
+    ],
+    tip:"Mango and chilli is one of the great flavour combinations in the world. The sweetness, acidity and heat play perfectly together. This drink often becomes a firm favourite."
+  },
+  {
+    name:"Apple Rose Sparkler", tagline:"Light, floral and delicate", cat:"sig", diff:1,
+    glitter:"Baby Pink floated on top", spice:"Cardamom pinch stirred in",
+    ings:["100ml Apple sparkling juice","20ml Monin Rose syrup","Juice of half a lemon","Schweppes Tonic Water to top","Ice","Baby Pink glitter","Cardamom — tiny pinch"],
+    steps:[
+      {t:"Fill a wine glass or tall glass with <em>ice</em>. A wine glass is ideal for this drink — it feels elegant and the wide bowl lets the aroma breathe."},
+      {t:"Pour in the <em>100ml Apple sparkling juice</em>."},
+      {t:"Add the <em>20ml Rose syrup</em> — it turns the drink a beautiful blush pink instantly."},
+      {t:"Squeeze in the <em>juice of half a lemon</em>. This brightens everything and balances the sweetness."},
+      {t:"Add a <em>tiny pinch of cardamom</em> — just the very tip of a teaspoon. Stir gently once. Cardamom and rose is a classic Middle Eastern pairing that elevates this completely."},
+      {t:"Top very gently with <em>Tonic Water</em> — the apple juice is already sparkling so pour slowly to avoid a fizz overflow."},
+      {t:"Float a delicate pinch of <em>Baby Pink glitter</em> on the surface. Do not stir — let it sit."},
+      {t:"Garnish with a thin lemon wheel resting inside the glass."}
+    ],
+    tip:"This is the most approachable, crowd-pleasing drink on the menu. If someone doesn't know what to order, start them on this. It also batches very easily for groups."
+  },
+  {
+    name:"Matcha Lychee Latte", tagline:"Café showpiece — the layered pour", cat:"mat", diff:3,
+    glitter:"Apple Green glitter dusted on the foam", spice:"White pepper in the matcha paste",
+    ings:["1.5 tsp matcha powder","2–3 tbsp hot water at 80°C (not boiling)","20ml Monin Lychee syrup","150ml canned coconut milk (shaken well)","Ice","Apple Green glitter","White pepper — tiny pinch (optional but recommended)"],
+    steps:[
+      {t:"<em>Make the matcha paste:</em> Add 1.5 tsp matcha to a small bowl. Add just 2–3 tbsp hot water (80°C — if you don't have a thermometer, boil the kettle then let it sit for 3 minutes). Whisk in a fast zigzag motion, not circles, until completely smooth with zero lumps. Use your matcha chasen whisk if you have it — it makes a huge difference."},
+      {t:"Add a <em>tiny pinch of white pepper</em> to the matcha paste and stir through. This sounds odd but adds a warm depth that makes the matcha taste richer and more complex."},
+      {t:"<em>Froth the coconut milk:</em> Shake the coconut tin well before opening. Pour 150ml into a jar, seal it and shake hard for 30 seconds, or froth it with a milk frother. You want it lightly foamy and cold."},
+      {t:"Fill your serving glass with <em>ice</em>."},
+      {t:"Add the <em>20ml Lychee syrup</em> to the glass first."},
+      {t:"Pour the <em>frothed coconut milk</em> slowly over the ice. It should settle as a creamy pale white layer."},
+      {t:"<em>The layered pour:</em> hold a spoon face-down just above the surface of the coconut milk. Pour the <em>matcha paste</em> very slowly over the back of the spoon so it trickles gently onto the surface. It should float as a vivid green layer. Take your time — this is the skill."},
+      {t:"Dust <em>Apple Green glitter</em> on the matcha foam. Serve without stirring — let the guest mix it themselves for a dramatic colour reveal."}
+    ],
+    tip:"If the matcha sinks into the coconut milk, the coconut milk was either too warm or too thin. Always use canned full-fat coconut milk, not coconut water or carton coconut milk. The cold temperature and fat content are what hold the layers apart."
+  },
+  {
+    name:"Matcha Rose Tonic", tagline:"The viral café drink", cat:"mat", diff:2,
+    glitter:"Violet glitter dusted generously on top", spice:"Cinnamon pinch on top",
+    ings:["1 tsp matcha powder","2–3 tbsp hot water at 80°C","15ml Monin Rose syrup","15ml Monin Pure Cane Sugar syrup","Juice of half a lemon","Schweppes Tonic Water to top","Ice","Violet glitter","Cinnamon — pinch"],
+    steps:[
+      {t:"<em>Make the matcha paste:</em> Whisk 1 tsp matcha with 2–3 tbsp hot water (80°C) until completely smooth. Let it cool for 2 minutes before using."},
+      {t:"Add the <em>15ml Rose syrup</em>, <em>15ml Pure Cane Sugar</em>, and <em>juice of half a lemon</em> to the cooled matcha. Stir everything together."},
+      {t:"Fill a tall glass with <em>ice all the way to the top</em> — a full glass of ice is important here."},
+      {t:"Pour the matcha mixture over the ice. It will settle as a deep green layer."},
+      {t:"Top slowly with <em>Tonic Water</em>, pouring over the back of a spoon. The slight bitterness of tonic is what makes this drink extraordinary — it balances the floral rose and earthy matcha perfectly."},
+      {t:"Dust a generous pinch of <em>Violet glitter</em> over the top. The contrast of the deep green drink with violet shimmer is visually stunning."},
+      {t:"Add a small pinch of <em>cinnamon</em> for a warm spice aroma."},
+      {t:"Serve with a reusable straw. Sip slowly — the flavours evolve beautifully as the ice melts."}
+    ],
+    tip:"This is the most sophisticated, adult-tasting drink on the menu. The tonic bitterness is intentional and is what separates it from a sweet café drink. If it's too bitter, reduce tonic and top with soda water instead."
+  },
+  {
+    name:"Matcha Blueberry Smash", tagline:"Earthy meets fruity", cat:"mat", diff:3,
+    glitter:"Sea Blue + Violet mixed and dusted on top", spice:"Star anise infused in coconut milk",
+    ings:["Large handful fresh blueberries","1.5 tsp matcha powder","Splash of hot water to form paste","20ml Monin Pure Cane Sugar syrup","100ml canned coconut milk","Ice","Sea Blue + Violet glitter","Star anise (optional)"],
+    steps:[
+      {t:"<em>Optional but excellent:</em> drop a star anise into the coconut milk and let it sit for 10–15 minutes to infuse. Remove the star anise before using the milk. This adds a mysterious anise depth."},
+      {t:"Add the <em>large handful of blueberries</em> to your cocktail shaker. Muddle completely until you have a dark, deeply purple liquid at the bottom — no whole berries remaining."},
+      {t:"Whisk <em>1.5 tsp matcha</em> with just enough hot water to form a smooth paste."},
+      {t:"Add the matcha paste, <em>20ml Pure Cane Sugar</em>, and <em>100ml coconut milk</em> to the blueberry shaker."},
+      {t:"Fill with ice and <em>shake vigorously for 20 full seconds</em>. This needs real energy — you're emulsifying three very different ingredients."},
+      {t:"<em>Double strain</em> through the shaker strainer AND a fine kitchen sieve into a glass filled with fresh ice. This removes all blueberry seeds. The result should be a silky, deep blue-green liquid."},
+      {t:"Mix <em>Sea Blue and Violet glitters</em> together and dust generously over the surface."},
+      {t:"Serve with a straw. As the ice melts slowly, the layers within the drink shift and evolve in colour."}
+    ],
+    tip:"The double strain is completely non-negotiable here. Blueberry seeds in a silky, creamy drink is an unpleasant texture that ruins the experience. Always, always double strain."
+  },
+  {
+    name:"Jackfruit Custard Dream", tagline:"Southeast Asian dessert in a glass", cat:"des", diff:2,
+    glitter:"Sparkle Gold stirred through + generous dust on top", spice:"Nutmeg + cinnamon dusted on top",
+    ings:["3–4 pieces canned jackfruit from Aroy-D tin","60ml Devon custard","30ml canned coconut milk","20ml Santa Vittoria Vanilla syrup","20ml Monin Pure Cane Sugar syrup","Crushed ice","Sparkle Gold glitter","Ground nutmeg + ground cinnamon"],
+    steps:[
+      {t:"Drain <em>3–4 jackfruit pieces</em> from the tin. Pat them dry with paper towel to remove excess syrup."},
+      {t:"Add jackfruit to a blender with <em>60ml Devon custard</em>, <em>30ml coconut milk</em>, <em>20ml Vanilla syrup</em>, and <em>20ml Pure Cane Sugar</em>. Blend on high for 30–45 seconds until completely smooth."},
+      {t:"No blender? Mash the jackfruit as thoroughly as possible with a fork until it's almost a paste, then add all liquids and shake very hard in your cocktail shaker."},
+      {t:"Add a pinch of <em>Sparkle Gold glitter</em> to the blender and pulse once more — this distributes glitter evenly throughout the entire drink."},
+      {t:"Fill a glass with <em>crushed ice</em> all the way to the rim."},
+      {t:"Pour the blended mixture over the ice. It should be thick, creamy and a warm tropical gold colour."},
+      {t:"Mix a small pinch each of <em>ground nutmeg and ground cinnamon</em> and dust generously over the top."},
+      {t:"Finish with a final generous dusting of <em>Sparkle Gold glitter</em> over the spices. Serve with a thick straw or dessert spoon — this is a dessert drink."}
+    ],
+    tip:"Jackfruit has a very mild tropical sweetness and takes on the flavour of whatever you pair it with. Blended with custard and vanilla it tastes remarkably like a tropical crème brûlée. This always surprises people."
+  },
+  {
+    name:"Rice Pudding Horchata", tagline:"Creamy, spiced and deeply indulgent", cat:"des", diff:2,
+    glitter:"Silver White stirred through and dusted on top", spice:"Cinnamon + nutmeg + pinch of clove",
+    ings:["3 tbsp Ambrosia Rice Pudding","150ml canned coconut milk","20ml Santa Vittoria Vanilla syrup","20ml Monin Pure Cane Sugar syrup","Drizzle of sweetened condensed milk","Ice","Silver White glitter","Cinnamon + nutmeg + tiny pinch of clove"],
+    steps:[
+      {t:"Add <em>3 tbsp rice pudding</em> and <em>150ml coconut milk</em> to a blender. Blend on high for 30–45 seconds until the rice is completely obliterated — the texture should be silky smooth with zero grain."},
+      {t:"No blender? Pass the rice pudding through a sieve first to remove the rice grains, then mix the strained liquid with the coconut milk and shake hard in a shaker."},
+      {t:"Add <em>20ml Vanilla syrup</em> and <em>20ml Pure Cane Sugar</em> to the blended base. Stir together well."},
+      {t:"Add a generous pinch of <em>Silver White glitter</em> and stir thoroughly. The drink should look otherworldly — creamy white with a full diamond shimmer throughout."},
+      {t:"Fill a tall glass with <em>ice</em>."},
+      {t:"Pour the horchata over the ice. It should be thick and silky."},
+      {t:"Drizzle a thin ribbon of <em>condensed milk</em> down the inside wall of the glass — it streaks down beautifully creating a marbled effect."},
+      {t:"Mix a pinch each of <em>cinnamon, nutmeg and clove</em> — these three together are the classic horchata spice signature. Dust heavily over the top. Serve with a thick straw."}
+    ],
+    tip:"This is a rich, dessert-weight drink — it's essentially a liquid dessert. Serve in a smaller glass or alongside a light menu. A little goes a very long way."
+  },
+  {
+    name:"Passion Fruit Rose Spritz", tagline:"Simple, stunning and easy to batch", cat:"sig", diff:1,
+    glitter:"Baby Pink + Strawberry glitter floated on top", spice:"Pinch of ground ginger for warmth",
+    ings:["60ml Passion fruit drink","20ml Monin Rose syrup","Juice of half a lemon","Schweppes Soda Water to top","Ice","Baby Pink + Strawberry glitter","Ground ginger — tiny pinch (optional)"],
+    steps:[
+      {t:"Fill a wine glass or tall glass with <em>ice</em>."},
+      {t:"Pour in the <em>60ml Passion fruit drink</em>. The deep golden-orange colour is gorgeous."},
+      {t:"Add the <em>20ml Rose syrup</em> — before you stir, watch it bleed through the passion fruit creating a stunning two-tone orange and pink gradient."},
+      {t:"Add the <em>juice of half a lemon</em>. Give the glass a single, gentle stir — just once, preserving some of the gradient."},
+      {t:"Optional: add a <em>tiny pinch of ground ginger</em> for a warm background note. Stir once if adding."},
+      {t:"Top slowly and gently with <em>soda water</em>."},
+      {t:"Mix <em>Baby Pink and Strawberry glitters</em> together and float a generous pinch on the surface. Deep pink shimmer on a rose-gold drink is breathtaking."},
+      {t:"Garnish with a lemon wheel. This is your easiest and most foolproof drink — the colour alone sells it."}
+    ],
+    tip:"This batches beautifully. For a group, multiply passion fruit and rose by the number of guests, mix in a large jug, then pour into individual ice-filled glasses and add the soda water + glitter per glass."
+  },
+  {
+    name:"Thai Milk Tea Pineapple Punch", tagline:"Rich, tropical and indulgent", cat:"des", diff:2,
+    glitter:"Sparkle Gold dusted generously on top", spice:"Vanilla + cinnamon",
+    ings:["60ml Dimes Pineapple juice","30ml sweetened condensed milk","20ml Santa Vittoria Vanilla syrup","20ml Monin Peach syrup","Drizzle of sweet condensed coconut milk","Crushed ice","Sparkle Gold glitter"],
+    steps:[
+      {t:"Fill your cocktail shaker with ice."},
+      {t:"Add the <em>60ml Pineapple juice</em>, <em>30ml condensed milk</em>, <em>20ml Vanilla syrup</em>, and <em>20ml Peach syrup</em>."},
+      {t:"<em>Shake hard for 15–20 seconds.</em> The condensed milk needs real, vigorous shaking to fully emulsify into a creamy texture. You should hear it mixing — it sounds different once emulsified."},
+      {t:"Let the shaker rest for 30 seconds, then shake once more. This second shake after resting significantly improves the final texture."},
+      {t:"Fill a glass with <em>crushed ice</em> all the way to the rim."},
+      {t:"Strain the mixture over the ice. It should be pale creamy gold and slightly frothy from the shaking."},
+      {t:"Drizzle a generous ribbon of <em>sweet condensed coconut milk</em> across the top — it floats as a luxurious creamy layer."},
+      {t:"Dust very generously with <em>Sparkle Gold glitter</em>. This is a dramatic, indulgent drink — be generous with the glitter. Serve with a thick straw."}
+    ],
+    tip:"Serve this alongside the Lychee Coconut Cloud as a pair — they complement each other perfectly and represent the full range of your Southeast Asian-inspired dessert drinks."
+  }
+];
+
+let curCat = 'all';
+
+function tagCls(c){return{sig:'tag-sig',trop:'tag-trop',mat:'tag-mat',des:'tag-des',ene:'tag-ene'}[c]||'tag-sig';}
+function tagLbl(c){return{sig:'Signature',trop:'Tropical',mat:'Matcha',des:'Dessert',ene:'Energy'}[c]||c;}
+
+function mkDots(n){
+  let h='<div class="dots">';
+  for(let i=1;i<=3;i++) h+=`<div class="dot${i<=n?' on':''}"></div>`;
+  return h+'</div>';
+}
+
+function renderGrid(list){
+  const g=document.getElementById('grid');
+  if(!list.length){g.innerHTML='<div class="empty">No drinks found — try a different search</div>';return;}
+  g.innerHTML=list.map(d=>{
+    const idx=drinks.indexOf(d);
+    return`<div class="card" onclick="openDetail(${idx})">
+      <div class="card-top">
+        <span class="tag ${tagCls(d.cat)}">${tagLbl(d.cat)}</span>
+        <div class="card-name">${d.name}</div>
+        <div class="card-desc">${d.tagline}</div>
+      </div>
+      <div class="card-foot">
+        <div>
+          <div class="diff-label">Difficulty</div>
+          ${mkDots(d.diff)}
+        </div>
+        <div class="view-btn">View Recipe →</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function doFilter(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  renderGrid(drinks.filter(d=>{
+    const mc=curCat==='all'||d.cat===curCat;
+    const mq=!q||d.name.toLowerCase().includes(q)||d.tagline.toLowerCase().includes(q);
+    return mc&&mq;
+  }));
+}
+
+function setCat(c,btn){
+  curCat=c;
+  document.querySelectorAll('.flt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  doFilter();
+}
+
+function openDetail(idx){
+  const d=drinks[idx];
+  document.getElementById('grid').style.display='none';
+  document.querySelector('.controls').style.display='none';
+  const dv=document.getElementById('detailView');
+  dv.style.display='block';
+  document.getElementById('detailCard').innerHTML=`
+    <div class="detail-top">
+      <span class="tag ${tagCls(d.cat)}">${tagLbl(d.cat)}</span>
+      <div class="detail-name">${d.name}</div>
+      <div class="detail-tagline">${d.tagline}</div>
+    </div>
+    <div class="detail-body">
+      <div class="sec-head">What you need</div>
+      <div class="ings">${d.ings.map(i=>`<div class="ing"><div class="ing-dot"></div>${i}</div>`).join('')}</div>
+      <div class="sec-head">How to make it</div>
+      <div class="steps">${d.steps.map((s,i)=>`<div class="step"><div class="step-num">${i+1}</div><div class="step-text">${s.t}</div></div>`).join('')}</div>
+      <div class="sec-head">Finishing touches</div>
+      <div class="gs-row">
+        <div class="gs-box"><div class="gs-label">Glitter</div><div class="gs-val">${d.glitter}</div></div>
+        <div class="gs-box"><div class="gs-label">Spice</div><div class="gs-val">${d.spice}</div></div>
+      </div>
+      <div class="tip-box">
+        <div class="tip-label">Bartender's Tip</div>
+        <div class="tip-text">${d.tip}</div>
+      </div>
+    </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBack(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('grid').style.display='grid';
+  document.querySelector('.controls').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderGrid(drinks);
+</script>
+</body>
+</html>
