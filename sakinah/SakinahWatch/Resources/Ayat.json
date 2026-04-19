@@ -1,0 +1,74 @@
+[
+  {
+    "surah": 1, "surahName": "Al-Fatihah", "number": 1,
+    "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    "translation": "In the name of Allah, the Most Gracious, the Most Merciful.",
+    "hours": [4, 5, 6, 12, 18]
+  },
+  {
+    "surah": 2, "surahName": "Al-Baqarah", "number": 255,
+    "arabic": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",
+    "translation": "Allah — there is no deity except Him, the Ever-Living, the Sustainer of existence. Neither drowsiness overtakes Him nor sleep.",
+    "hours": [20, 21, 22, 23, 0]
+  },
+  {
+    "surah": 13, "surahName": "Ar-Ra'd", "number": 28,
+    "arabic": "الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+    "translation": "Those who believe and whose hearts find rest in the remembrance of Allah. Truly in the remembrance of Allah do hearts find rest.",
+    "hours": [9, 10, 14, 15, 16]
+  },
+  {
+    "surah": 94, "surahName": "Ash-Sharh", "number": 6,
+    "arabic": "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+    "translation": "Indeed, with hardship comes ease.",
+    "hours": [7, 8, 13, 17]
+  },
+  {
+    "surah": 24, "surahName": "An-Nur", "number": 35,
+    "arabic": "اللَّهُ نُورُ السَّمَاوَاتِ وَالْأَرْضِ",
+    "translation": "Allah is the Light of the heavens and the earth.",
+    "hours": [18, 19, 20]
+  },
+  {
+    "surah": 112, "surahName": "Al-Ikhlas", "number": 1,
+    "arabic": "قُلْ هُوَ اللَّهُ أَحَدٌ",
+    "translation": "Say, He is Allah, the One.",
+    "hours": [5, 6, 21, 22]
+  },
+  {
+    "surah": 3, "surahName": "Ali 'Imran", "number": 8,
+    "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا",
+    "translation": "Our Lord, let not our hearts deviate after You have guided us.",
+    "hours": [11, 12, 13]
+  },
+  {
+    "surah": 65, "surahName": "At-Talaq", "number": 3,
+    "arabic": "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+    "translation": "And whoever places their trust in Allah — He is sufficient for them.",
+    "hours": [8, 9, 14, 17]
+  },
+  {
+    "surah": 20, "surahName": "Ta-Ha", "number": 14,
+    "arabic": "إِنَّنِي أَنَا اللَّهُ لَا إِلَٰهَ إِلَّا أَنَا فَاعْبُدْنِي وَأَقِمِ الصَّلَاةَ لِذِكْرِي",
+    "translation": "Indeed, I am Allah. There is no deity except Me, so worship Me and establish prayer for My remembrance.",
+    "hours": [4, 5, 12, 15, 18, 20]
+  },
+  {
+    "surah": 2, "surahName": "Al-Baqarah", "number": 286,
+    "arabic": "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+    "translation": "Allah does not burden a soul beyond what it can bear.",
+    "hours": [10, 11, 16, 17]
+  },
+  {
+    "surah": 73, "surahName": "Al-Muzzammil", "number": 8,
+    "arabic": "وَاذْكُرِ اسْمَ رَبِّكَ وَتَبَتَّلْ إِلَيْهِ تَبْتِيلًا",
+    "translation": "And remember the name of your Lord and devote yourself to Him with complete devotion.",
+    "hours": [2, 3, 4]
+  },
+  {
+    "surah": 39, "surahName": "Az-Zumar", "number": 53,
+    "arabic": "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ",
+    "translation": "Do not despair of the mercy of Allah.",
+    "hours": [22, 23, 0, 1]
+  }
+]
