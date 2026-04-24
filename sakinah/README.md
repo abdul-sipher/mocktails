@@ -12,7 +12,7 @@ ayah for the moment, and points you to the nearest mosque.
 |---|---|
 | Wudu tracker | Detects washing-gesture repetitions via `CMDeviceMotion` and advances through the 9 canonical steps. |
 | Salah tracker | Classifies qiyām / rukūʿ / sujūd / jalsa / tashahhud from wrist gravity + altitude; counts rakʿāt and which sajdah you're in. |
-| Rakah haptic | A double-tap `.success` haptic on each completed rakʿah; distinct notification taps for sajdah 1 vs 2. |
+| Rakah haptic | N `.success` haptics on each completed rakʿah — 1 buzz after the 1st rakah, 2 after the 2nd, and so on. Distinct notification taps for sajdah 1 vs 2. |
 | Dhikr reminder | `HealthKit` HR above rolling baseline + low HRV → suggests a pause for tasbīḥ. |
 | Ayah of the hour | Bundled `Ayat.json` maps verses to hours of the day; refreshes every 30 minutes. |
 | Mosque finder | `MKLocalSearch` query for "mosque" ranked by distance; suggests the nearest when a prayer window opens. |

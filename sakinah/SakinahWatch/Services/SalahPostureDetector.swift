@@ -135,8 +135,10 @@ final class SalahPostureDetector: ObservableObject {
     }
 
     private func advanceRakah() {
-        guard session.currentRakah < session.rakahCount else {
-            haptic.play(.salahComplete)
+        let completed = session.currentRakah
+        haptic.playRakahCount(completed)
+
+        if completed >= session.rakahCount {
             session.endedAt = Date()
             return
         }
@@ -144,7 +146,6 @@ final class SalahPostureDetector: ObservableObject {
         session.currentSajdah = 0
         sujoodCountThisRakah = 0
         rukuSeenThisRakah = false
-        haptic.play(.rakahComplete)
     }
 
     // MARK: - Manual override (for forgetful moments)
