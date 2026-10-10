@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 @main
 struct SakinahWatchApp: App {
@@ -28,6 +29,14 @@ final class AppSession: ObservableObject {
     @Published var nextPrayer: PrayerTime?
     @Published var currentAyah: Ayah?
     @Published var dhikrReminderActive = false
+    /// True while the next prayer is ≤ 10 min away and a mosque is known.
+    @Published var mosqueNudgeActive = false
+
+    /// Latest fix. Screens read this rather than calling location.stream(),
+    /// which only supports one listener.
+    @Published private(set) var lastCoordinate: CLLocationCoordinate2D?
+    /// Prayer window already nudged, so the haptic plays once per prayer.
+    private var nudgedPrayerDate: Date?
 
     func bootstrap() async {
         await heart.requestAuthorization()
@@ -36,6 +45,7 @@ final class AppSession: ObservableObject {
         Task { await observeAnxiety() }
         Task { await refreshLocationContext() }
         Task { await refreshAyahTimer() }
+        Task { await refreshPrayerWindow() }
     }
 
     private func observeAnxiety() async {
@@ -48,8 +58,35 @@ final class AppSession: ObservableObject {
 
     private func refreshLocationContext() async {
         for await coord in location.stream() {
+            lastCoordinate = coord
             nearestMosque = try? await mosques.nearest(to: coord)
             nextPrayer = prayerTimes.next(at: coord)
+            checkMosqueNudge()
+        }
+    }
+
+    /// Location updates only arrive on movement, so recheck the clock
+    /// regularly to roll over to the next prayer and open the nudge window.
+    private func refreshPrayerWindow() async {
+        while !Task.isCancelled {
+            if let coord = lastCoordinate {
+                nextPrayer = prayerTimes.next(at: coord)
+                checkMosqueNudge()
+            }
+            try? await Task.sleep(for: .seconds(30))
+        }
+    }
+
+    private func checkMosqueNudge() {
+        guard let next = nextPrayer, nearestMosque != nil else {
+            mosqueNudgeActive = false
+            return
+        }
+        let remaining = next.date.timeIntervalSinceNow
+        mosqueNudgeActive = remaining > 0 && remaining <= 10 * 60
+        if mosqueNudgeActive && nudgedPrayerDate != next.date {
+            nudgedPrayerDate = next.date
+            haptic.play(.mosqueSuggestion)
         }
     }
 

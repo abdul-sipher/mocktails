@@ -7,6 +7,9 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 10) {
+                    if session.mosqueNudgeActive, let next = session.nextPrayer, let mosque = session.nearestMosque {
+                        MosqueNudgeCard(next: next, mosque: mosque)
+                    }
                     NextPrayerCard(next: session.nextPrayer)
                     AyahCard(ayah: session.currentAyah)
                     TileGrid()
@@ -17,6 +20,39 @@ struct HomeView: View {
             }
             .navigationTitle("Sakīnah")
         }
+        .sheet(isPresented: $session.dhikrReminderActive) {
+            DhikrReminderView()
+        }
+    }
+}
+
+/// "Dhuhr in 8 min — pray at Masjid X (240 m)?" shown in the 10 minutes before a prayer.
+private struct MosqueNudgeCard: View {
+    let next: PrayerTime
+    let mosque: Mosque
+
+    var body: some View {
+        NavigationLink {
+            MosqueFinderView()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "building.columns.fill").foregroundStyle(.orange)
+                // Own timeline: the card's inputs don't change as the minutes tick down.
+                TimelineView(.periodic(from: .now, by: 15)) { context in
+                    Text("\(next.name.title) in \(minutesLeft(at: context.date)) min — pray at \(mosque.name) (\(Int(mosque.distanceMeters)) m)?")
+                        .font(.footnote.weight(.semibold))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.orange.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func minutesLeft(at now: Date) -> Int {
+        max(1, Int(next.date.timeIntervalSince(now) / 60))
     }
 }
 

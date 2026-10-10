@@ -1,0 +1,51 @@
+name: SakinahWatch
+options:
+  bundleIdPrefix: com.abdulelmir
+  deploymentTarget:
+    watchOS: "10.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  SakinahWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: SakinahWatch
+        excludes:
+          - Info.plist
+    entitlements:
+      path: SakinahWatch/SakinahWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abdulelmir.sakinah.watchkitapp
+        PRODUCT_NAME: SakinahWatch
+        INFOPLIST_FILE: SakinahWatch/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        TARGETED_DEVICE_FAMILY: "4"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_PREVIEWS: YES
+  SakinahWatchUITests:
+    type: bundle.ui-testing
+    platform: watchOS
+    sources: [SakinahWatchUITests]
+    dependencies:
+      - target: SakinahWatch
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.abdulelmir.sakinah.uitests
+        TEST_TARGET_NAME: SakinahWatch
+schemes:
+  SakinahWatch:
+    build:
+      targets:
+        SakinahWatch: all
+    run:
+      config: Debug
+    test:
+      targets: [SakinahWatchUITests]

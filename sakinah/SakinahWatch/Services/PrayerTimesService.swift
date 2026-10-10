@@ -27,9 +27,10 @@ final class PrayerTimesService {
         let eq = equationOfTime(julian: julian)
         let lat = coord.latitude
         let lng = coord.longitude
-        let tz = TimeZone.current.secondsFromGMT(for: date) / 3600
+        // Double, not Int: half-hour zones (Adelaide, India, Tehran) need the .5.
+        let tz = Double(TimeZone.current.secondsFromGMT(for: date)) / 3600
 
-        let dhuhr = 12 + Double(tz) - lng / 15 - eq / 60
+        let dhuhr = 12 + tz - lng / 15 - eq / 60
 
         let (fajrAngle, ishaAngle) = angles(for: method)
         let fajr  = dhuhr - hourAngle(angle: fajrAngle,  lat: lat, decl: decl) / 15
@@ -37,7 +38,7 @@ final class PrayerTimesService {
         let sunrise = dhuhr - hourAngle(angle: 0.833,    lat: lat, decl: decl) / 15
         let maghrib = dhuhr + hourAngle(angle: 0.833,    lat: lat, decl: decl) / 15
         let asrAngle = -atan(1 / (asrFactor + tan(abs(lat - decl) * .pi / 180))) * 180 / .pi
-        let asr = dhuhr + hourAngle(angle: 90 - asrAngle, lat: lat, decl: decl) / 15
+        let asr = dhuhr + hourAngle(angle: asrAngle, lat: lat, decl: decl) / 15
 
         return [
             .init(name: .fajr,    date: dateFromHour(fajr,    base: date, cal: cal)),
@@ -89,7 +90,11 @@ final class PrayerTimesService {
         let L = q + 1.915 * sin(g * .pi / 180) + 0.020 * sin(2 * g * .pi / 180)
         let e = 23.439 - 0.00000036 * d
         let RA = atan2(cos(e * .pi / 180) * sin(L * .pi / 180), cos(L * .pi / 180)) * 180 / .pi / 15
-        return (q / 15 - RA) * 60  // minutes
+        // q/15 is 0–24h and RA is ±12h; wrap the difference to ±12h or every
+        // time lands a whole day early.
+        var diff = (q / 15 - RA).truncatingRemainder(dividingBy: 24)
+        if diff > 12 { diff -= 24 } else if diff < -12 { diff += 24 }
+        return diff * 60  // minutes
     }
 
     private func hourAngle(angle: Double, lat: Double, decl: Double) -> Double {

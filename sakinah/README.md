@@ -53,25 +53,37 @@ SakinahWatch/
 
 ## Building in Xcode
 
-This tree is the source for a watchOS app, but the `.xcodeproj` itself
-is not included (generated project files are Xcode-version-specific
-and fragile to hand-write). The setup is a one-time 2-minute step:
+The Xcode project is generated from `project.yml` with
+[XcodeGen](https://github.com/yonaskolb/XcodeGen); the `.xcodeproj` is
+not committed.
 
-1. Open Xcode → **File ▸ New ▸ Project** → **watchOS ▸ App**.
-2. Product name: `SakinahWatch`. Interface: **SwiftUI**. Language: **Swift**.
-3. Uncheck "Include Tests" unless you want them. Save the project.
-4. Delete the auto-generated `ContentView.swift` and `SakinahWatchApp.swift` from the new project.
-5. In Finder, drag the contents of `SakinahWatch/` (Models, Services, Views, `SakinahWatchApp.swift`, `Resources/Ayat.json`) into the Watch App target in the Xcode sidebar. Check **Copy items if needed** and **Add to target: SakinahWatch Watch App**.
-6. Open the target's **Info** tab and add the keys from this repo's `Info.plist`:
-   - `NSMotionUsageDescription`
-   - `NSHealthShareUsageDescription`
-   - `NSHealthUpdateUsageDescription`
-   - `NSLocationWhenInUseUsageDescription`
-7. **Signing & Capabilities** → `+ Capability`:
-   - **HealthKit** (check "Background Delivery" if you want anxiety detection when the app is backgrounded)
-   - **Background Modes** → enable **Location updates** and **Workout processing**
-8. Select an Apple Watch Series 6 or later simulator (altimeter + motion are simulated) or your paired device.
-9. ⌘R to run.
+```sh
+brew install xcodegen
+cd sakinah
+xcodegen                       # writes SakinahWatch.xcodeproj
+open SakinahWatch.xcodeproj    # or build from the command line:
+xcodebuild -project SakinahWatch.xcodeproj -scheme SakinahWatch \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' build
+```
+
+`project.yml` sets up a watch-only app (watchOS 10+), bundles
+`Resources/Ayat.json`, uses `SakinahWatch/Info.plist` (usage strings,
+`WKWatchOnly`, background modes) and the HealthKit entitlement. To run
+on a real watch, pick your team under **Signing & Capabilities**.
+
+### Smoke test in the simulator
+
+`SakinahWatchUITests` launches the app, closes the Health prompt, and
+opens Home, Ayah, Wudu (taps Next), Salah (± rakah) and Mosques:
+
+```sh
+xcrun simctl location <udid> set -33.9205,151.0756   # Lakemba
+TEST_RUNNER_SHOT_DIR=/tmp/shots xcodebuild test -project SakinahWatch.xcodeproj \
+  -scheme SakinahWatch -destination 'platform=watchOS Simulator,id=<udid>'
+```
+
+Motion, the barometer and heart rate are not simulated, so posture
+detection, wudu rep counting and the dhikr reminder need a real watch.
 
 ## Calibration notes
 

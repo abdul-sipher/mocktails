@@ -80,8 +80,11 @@ final class SalahPostureDetector: ObservableObject {
             return .qiyam
         }
         // Jalsa / tashahhud: sitting, forearm on thigh, altitude mid.
+        // Same wrist pose for both; rakah state tells them apart. After both
+        // sujoods of rakah 2 (middle sitting) or of the final rakah, it is tashahhud.
         if abs(gy) < 0.4 && gz > 0.3 && still {
-            return posture == .sujood ? .jalsa : .jalsa
+            let tashahhudRakah = session.currentRakah == 2 || session.currentRakah == session.rakahCount
+            return sujoodCountThisRakah >= 2 && tashahhudRakah ? .tashahhud : .jalsa
         }
         // Qawmah: transient upright after ruku.
         if gy < -0.4 && altitudeDelta > -0.08 && still {
@@ -120,7 +123,7 @@ final class SalahPostureDetector: ObservableObject {
             session.currentSajdah = sujoodCountThisRakah
             haptic.play(sujoodCountThisRakah == 1 ? .sajdahOne : .sajdahTwo)
 
-        case (.sujood, .qiyam), (.jalsa, .qiyam):
+        case (.sujood, .qiyam), (.jalsa, .qiyam), (.tashahhud, .qiyam):
             // New rakah begins on return to standing after two sujoods.
             if sujoodCountThisRakah >= 2 {
                 advanceRakah()

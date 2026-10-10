@@ -19,17 +19,15 @@ struct MosqueFinderView: View {
             }
         }
         .navigationTitle("Mosques")
-        .task { await load() }
+        .task(id: session.lastCoordinate.map { "\($0.latitude),\($0.longitude)" }) { await load() }
     }
 
     private func load() async {
-        for await coord in session.location.stream() {
-            do {
-                mosques = try await session.mosques.nearby(to: coord)
-            } catch {
-                self.error = "Could not load nearby mosques."
-            }
-            break
+        guard let coord = session.lastCoordinate else { return }
+        do {
+            mosques = try await session.mosques.nearby(to: coord)
+        } catch {
+            self.error = "Could not load nearby mosques."
         }
     }
 }
