@@ -71,8 +71,10 @@ notifications / Focus control (no public API).
   twilightAngle), `wrist` (left/right), `rakahHaptics` (Bool, default
   true), `calmReminders` (Bool, default false), `hasChosenMethod`.
 - **`SettingsStore`** (`ObservableObject`): loads/saves
-  `PrayerSettings` as JSON in `UserDefaults` (App Group suite once
-  Stage 2 adds the widget; standard suite until then — one constant).
+  `PrayerSettings` as JSON in the App Group `UserDefaults` suite from
+  Stage 1 (so Stage 2's widget reads the same settings with no
+  migration). Decoding is per-field with defaults, so adding a field
+  later never silently resets a user's settings.
 - **`PrayerEngine`**: pure, no CoreLocation dependency. Input:
   coordinate, date, time zone, settings. Output: `DayTimetable`.
   Wraps Adhan (`PrayerTimes`, `SunnahTimes`, `Qibla` later).
@@ -90,7 +92,13 @@ notifications / Focus control (no public API).
   until 4:18 pm".
 - **`AppSession`** keeps `lastCoordinate`; computes `timetable` and
   `nextPrayer` from `PrayerEngine` on location, on settings change, and
-  on the existing 30 s tick. Mosque nudge logic unchanged.
+  on the existing 30 s tick (which also rebuilds the timetable when the
+  calendar day changes). Mosque nudge logic unchanged.
+- **Health permission moves behind the calm-reminder switch** (default
+  off): no Health prompt at launch, and `AnxietyDetector` only runs
+  while the switch is on. Calm-reminder Stage 6 work builds on this.
+- **One sheet at a time on Home**: the method prompt and the dhikr
+  reminder use a single sheet enum, so SwiftUI never drops one.
 - **Views**: `SettingsView` (new tile + gear on Home), `TimetableView`
   (new tile), `MethodPromptView` (sheet on Home while
   `hasChosenMethod == false`; suggests a method from the device
@@ -120,12 +128,12 @@ immediately.
 ### Testing
 
 - Unit tests (new `SakinahWatchTests` target) for `PrayerEngine`
-  against published reference times (±2 min): Sydney (MWL, Shafi'i),
-  Adelaide (half-hour zone), London (MWL, Hanafi), Makkah (Umm
-  al-Qura), Oslo in June (high-latitude rule applied, no nil).
-  References are taken from Adhan's own published test fixtures where
-  they cover the case, otherwise from the authority's timetable, cited
-  in the test.
+  against Adhan's published fixtures (authority timetables, ±1–2 min),
+  copied into the test bundle with their source lines: Makkah (Umm
+  al-Qura), London (Moonsighting Committee), Tehran (half-hour zone,
+  +3:30), Dubai, Singapore. Sydney and Adelaide: ordering and
+  daylight-saving-transition checks (no official fixture available);
+  Oslo in June: high-latitude rule applied, no nil.
 - Unit tests: `next(after:)` across midnight; `window(at:)` between
   sunrise and Dhuhr returns none; offsets shift only their prayer;
   settings round-trip through the store.
@@ -138,3 +146,39 @@ immediately.
 Builds with no errors; all unit and UI tests pass in the watch
 simulator; screenshots of Home, Settings, Timetable and the method
 prompt saved to the Desktop screenshot folder; committed and pushed.
+
+## Stress test (grill-me, 12 Oct 2026)
+
+**Verified**
+- Adhan 1.5.0 API (cloned the tag): methods MWL, Egyptian, Karachi,
+  Umm al-Qura, Dubai, Moonsighting Committee, North America, Kuwait,
+  Qatar, Singapore, Tehran, Turkey; `Madhab` is the Asr choice
+  (shafi/hanafi); `HighLatitudeRule.recommended(for:)` exists, so
+  "auto" = nil; `SunnahTimes` gives the last third of the night. MIT.
+- Adhan's fixtures cover Makkah, London, Tehran, Dubai, Singapore,
+  Doha, Kuwait, Ankara — not Sydney, Adelaide or Oslo (test plan
+  adjusted).
+- watchOS SDK: `MKDirections.calculateETA` and
+  `CLLocationManager.headingAvailable` are available (Stage 4).
+- Publisher: Abdul's own name, as decided for the Kids Islam app.
+
+**Unverified**
+- Adhan builds through XcodeGen's Swift Package support for watchOS 10
+  with Xcode 27 — first step of the Stage 1 plan; if it fails, stop and
+  report before writing engine code.
+- Real-device behaviour (heading accuracy, workout session, haptics) —
+  needs Abdul's watch ⌚.
+
+**Changes made**
+- Settings stored in the App Group from Stage 1; per-field decoding.
+- Health permission only when calm reminders are switched on.
+- Timetable rebuilt on day change; single sheet on Home.
+- Test references switched to Adhan's sourced fixtures.
+
+**Judgement calls**
+
+| Question | Decision | Who |
+|---|---|---|
+| Free or paid? | Free. Allows non-commercial-licence translations (choice and licence recorded per text in Stage 5). | Abdul |
+| Method prompt skippable? | No: one tap, suggested method preselected. | Claude (default) |
+| Isha end / makruh minutes | As specified, labelled, on the scholar-check list. | Claude (default), scholar to confirm |
