@@ -19,7 +19,21 @@ final class ScreenSmokeTests: XCTestCase {
         wait(for: [gone], timeout: 20)
         shot("1-home")
 
-        open("Ayah"); shot("2-ayah"); back()
+        open("Qurʾan"); shot("2-quran"); back()
+
+        open("Duʿas"); shot("2b-duas")
+        app.staticTexts["Anger"].firstMatch.tap(); sleep(1)
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'When angry'")).firstMatch.tap(); sleep(1)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Bukhari'")).firstMatch.waitForExistence(timeout: 5), "du'a shows its source")
+        shot("2c-dua-reading"); back(); back(); back()
+
+        open("Adhkar"); shot("2d-adhkar")
+        app.staticTexts["Tasbih counter"].firstMatch.tap(); sleep(1)
+        let counter = app.buttons.matching(NSPredicate(format: "label ENDSWITH ' of 33'")).firstMatch
+        XCTAssertTrue(counter.waitForExistence(timeout: 5))
+        counter.tap(); counter.tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH '2 of'")).firstMatch.waitForExistence(timeout: 5), "tasbih counts taps")
+        shot("2e-tasbih"); back(); back()
 
         open("Wudu"); shot("3-wudu")
         let next = app.buttons["Next"]
@@ -27,15 +41,36 @@ final class ScreenSmokeTests: XCTestCase {
         next.tap(); shot("3b-wudu-after-next"); back()
 
         open("Salah"); shot("4-salah-start")
-        app.buttons["Start"].tap()
-        XCTAssertTrue(app.staticTexts["Rakah 1 / 4"].waitForExistence(timeout: 5))
-        app.buttons["Add"].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Rakah 2 / 4"].waitForExistence(timeout: 5), "+ rakah")
-        app.buttons["Remove"].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Rakah 1 / 4"].waitForExistence(timeout: 5), "− rakah")
-        shot("4b-salah-live"); back(); back()
+        let start = app.buttons["Start"]
+        for _ in 0..<6 where !(start.exists && start.isHittable) { app.swipeUp(); sleep(1) }
+        start.tap()
+        let ring = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Rakah 1 of'")).firstMatch
+        XCTAssertTrue(ring.waitForExistence(timeout: 5), "manual tracker shows rakah 1")
+        ring.tap(); ring.tap()   // two sajdahs complete rakah 1
+        let rakah2 = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Rakah 2 of'")).firstMatch
+        XCTAssertTrue(rakah2.waitForExistence(timeout: 5), "two taps complete a rakah")
+        shot("4b-salah-manual")
+        app.buttons["Undo"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Rakah 1 of'")).firstMatch.waitForExistence(timeout: 5), "undo")
+        app.buttons["Finish"].tap()
+        XCTAssertTrue(app.staticTexts["Review"].waitForExistence(timeout: 5), "review after finishing")
+        shot("4c-salah-review")
+        back(); back()
 
-        open("Mosques"); sleep(5); shot("5-mosques"); back()
+        open("Mosques"); sleep(6); shot("5-mosques")
+        let firstMosque = app.buttons.matching(NSPredicate(format: "label CONTAINS ' m'")).firstMatch
+        if firstMosque.waitForExistence(timeout: 10) {
+            firstMosque.tap(); sleep(6)
+            XCTAssertTrue(app.staticTexts["Walking"].waitForExistence(timeout: 5), "mosque detail shows walking time")
+            shot("5b-mosque-detail")
+            back()
+        }
+        back()
+
+        open("Qibla"); sleep(2)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Qibla '")).firstMatch.waitForExistence(timeout: 10),
+                      "qibla bearing shown")
+        shot("5c-qibla"); back()
 
         // Timetable shows sunrise; changing the method in Settings moves Fajr.
         open("Timetable"); shot("6-timetable")
@@ -56,23 +91,45 @@ final class ScreenSmokeTests: XCTestCase {
         XCTAssertNotEqual(fajrLabel(), fajrBefore, "changing method recalculates Fajr")
         back()
 
+        open("History"); shot("8-history")
+        let missed = app.buttons["Fajr missed"].firstMatch
+        missed.tap(); sleep(1)
+        XCTAssertTrue(missed.isSelected, "Fajr marked missed")
+        let owed = app.descendants(matching: .any)["qada-owed"]
+        for _ in 0..<12 where !(owed.exists && owed.isHittable) { nudgeUp(); sleep(1) }
+        shot("8b-history-qada")
+        XCTAssertTrue(owed.label.contains("1") || "\(owed.value ?? "")".contains("1"), "missing a prayer adds one qada: \(owed.label)")
+        for _ in 0..<6 { app.swipeDown() }
+        missed.tap()
+        back()
+
         XCTAssertEqual(app.state, .runningForeground, "app still running")
     }
 
     private func open(_ tile: String) {
         let b = app.buttons.containing(.staticText, identifier: tile).firstMatch
-        // Home's tile grid is lazy: scroll from the top until the tile exists
-        // and sits clear of the title bar.
+        // Home's tile grid is lazy: scroll from the top in small steps until
+        // the tile exists and sits clear of the title bar.
         let h = app.frame.height
-        for _ in 0..<4 { app.swipeDown() }
-        for _ in 0..<8 {
-            if b.exists, b.frame.midY > h * 0.3, b.frame.midY < h * 0.85 { break }
-            if b.exists, b.frame.midY <= h * 0.3 { app.swipeDown() } else { app.swipeUp() }
+        for _ in 0..<4 { app.swipeDown(velocity: .fast) }
+        for _ in 0..<16 {
+            if b.exists, b.frame.midY > h * 0.25, b.frame.midY < h * 0.9 { break }
+            if b.exists, b.frame.midY <= h * 0.25 {
+                app.swipeDown(velocity: .slow)
+            } else {
+                app.swipeUp(velocity: .slow)
+            }
             sleep(1)
         }
         XCTAssertTrue(b.exists, "tile \(tile)")
         b.tap()
         sleep(2)
+    }
+
+    /// A short drag: scrolls about a third of the screen.
+    private func nudgeUp() {
+        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
+        from.press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
     }
 
     private func back() {

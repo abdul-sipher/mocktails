@@ -14,8 +14,17 @@ import Combine
 final class SalahPostureDetector: ObservableObject {
     @Published private(set) var session: SalahSession
     @Published private(set) var posture: Posture = .idle
+    /// 0…1: how consistently recent samples agree. Below `minConfidence`
+    /// the detector holds its last posture rather than guess.
+    @Published private(set) var confidence: Double = 0
+
+    static let minConfidence = 0.5
 
     private let haptic: HapticService
+    private let hapticsOn: Bool
+    private let wrist: Wrist
+    private let calibration: CalibrationProfile?
+    private var recent: [Posture] = []
     private var lastPosture: Posture = .idle
     private var postureEnteredAt: Date = .distantPast
     private var altitudeBaseline: Double?
@@ -23,9 +32,13 @@ final class SalahPostureDetector: ObservableObject {
     private var sujoodCountThisRakah = 0
     private var task: Task<Void, Never>?
 
-    init(prayer: PrayerName, haptic: HapticService) {
-        self.session = SalahSession(prayer: prayer, rakahCount: prayer.defaultRakahs)
+    init(prayer: PrayerName, rakahCount: Int? = nil, haptic: HapticService,
+         hapticsOn: Bool = true, wrist: Wrist = .left, calibration: CalibrationProfile? = nil) {
+        self.session = SalahSession(prayer: prayer, rakahCount: rakahCount ?? prayer.defaultRakahs)
         self.haptic = haptic
+        self.hapticsOn = hapticsOn
+        self.wrist = wrist
+        self.calibration = calibration
     }
 
     func start(stream: AsyncStream<MotionService.Sample>) {
@@ -48,20 +61,43 @@ final class SalahPostureDetector: ObservableObject {
     private func ingest(_ s: MotionService.Sample) {
         if altitudeBaseline == nil { altitudeBaseline = s.relativeAltitude }
         let altDelta = s.relativeAltitude - (altitudeBaseline ?? 0)
-        let candidate = classify(sample: s, altitudeDelta: altDelta)
+        let (candidate, sampleConfidence) = classifyWithConfidence(sample: s, altitudeDelta: altDelta)
+        recent.append(candidate)
+        if recent.count > 25 { recent.removeFirst() }
+        let agreement = Double(recent.filter { $0 == candidate }.count) / Double(recent.count)
+        confidence = min(agreement, sampleConfidence)
+        guard confidence >= Self.minConfidence else { return }
         let stable = stabilize(candidate)
 
         guard stable != posture else { return }
         transition(to: stable)
     }
 
-    private func classify(sample s: MotionService.Sample, altitudeDelta: Double) -> Posture {
+    /// Calibrated profile when recorded, otherwise the default thresholds.
+    private func classifyWithConfidence(sample s: MotionService.Sample, altitudeDelta: Double) -> (Posture, Double) {
+        let gy = wrist == .right ? -s.gravityY : s.gravityY
+        if let calibration {
+            // Calibration was recorded on this wrist, so compare raw values.
+            let point = CalibrationProfile.Point(gx: s.gravityX, gy: s.gravityY, gz: s.gravityZ)
+            guard let hit = calibration.classify(point) else { return (posture, 0) }
+            var p = hit.posture
+            // Sitting is told apart by rakah state, not motion.
+            if p == .jalsa, sujoodCountThisRakah >= 2,
+               session.currentRakah == 2 || session.currentRakah == session.rakahCount {
+                p = .tashahhud
+            }
+            return (p, hit.confidence)
+        }
+        return (classify(sample: s, gravityY: gy, altitudeDelta: altitudeDelta), 1)
+    }
+
+    private func classify(sample s: MotionService.Sample, gravityY: Double, altitudeDelta: Double) -> Posture {
         // Gravity Z ≈ -1 means screen points up (wrist face-up on the ground → sujood).
         // Gravity Z ≈  0 means wrist is roughly vertical (ruku pose, arms on knees).
         // Gravity Y negative means forearm horizontal with screen toward body (qiyam).
         //
         // Altitude delta < ~-0.2 m: wrist dropped near floor → strong sujood signal.
-        let gy = s.gravityY
+        let gy = gravityY
         let gz = s.gravityZ
         let still = s.userAccelMag < 0.08 && s.rotationMag < 0.6
 
@@ -116,12 +152,12 @@ final class SalahPostureDetector: ObservableObject {
         switch (previous, new) {
         case (_, .ruku):
             rukuSeenThisRakah = true
-            haptic.play(.postureChange)
+            if hapticsOn { haptic.play(.postureChange) }
 
         case (_, .sujood):
             sujoodCountThisRakah += 1
             session.currentSajdah = sujoodCountThisRakah
-            haptic.play(sujoodCountThisRakah == 1 ? .sajdahOne : .sajdahTwo)
+            if hapticsOn { haptic.play(sujoodCountThisRakah == 1 ? .sajdahOne : .sajdahTwo) }
 
         case (.sujood, .qiyam), (.jalsa, .qiyam), (.tashahhud, .qiyam):
             // New rakah begins on return to standing after two sujoods.
@@ -130,16 +166,16 @@ final class SalahPostureDetector: ObservableObject {
             }
 
         case (_, .tashahhud):
-            haptic.play(.postureChange)
+            if hapticsOn { haptic.play(.postureChange) }
 
         default:
-            haptic.play(.postureChange)
+            if hapticsOn { haptic.play(.postureChange) }
         }
     }
 
     private func advanceRakah() {
         let completed = session.currentRakah
-        haptic.playRakahCount(completed)
+        if hapticsOn { haptic.playRakahCount(completed) }
 
         if completed >= session.rakahCount {
             session.endedAt = Date()

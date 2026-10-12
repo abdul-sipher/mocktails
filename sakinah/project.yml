@@ -1,6 +1,7 @@
 name: SakinahWatch
 options:
   bundleIdPrefix: com.abdulelmir
+  developmentLanguage: en
   deploymentTarget:
     watchOS: "10.0"
   createIntermediateGroups: true
@@ -21,6 +22,7 @@ targets:
           - Info.plist
     dependencies:
       - package: Adhan
+      - target: SakinahWidgets
     entitlements:
       path: SakinahWatch/SakinahWatch.entitlements
       properties:
@@ -36,6 +38,40 @@ targets:
         TARGETED_DEVICE_FAMILY: "4"
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_EMIT_LOC_STRINGS: YES
+  # Watch-face complications and Smart Stack widgets.
+  SakinahWidgets:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - SakinahWidgets
+      - SakinahWatch/Models/PrayerSettings.swift
+      - SakinahWatch/Models/DayTimetable.swift
+      - SakinahWatch/Models/SalahSession.swift
+      - SakinahWatch/Models/Posture.swift
+      - SakinahWatch/Models/SharedSnapshot.swift
+      - SakinahWatch/Services/PrayerEngine.swift
+    dependencies:
+      - package: Adhan
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    info:
+      path: SakinahWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Sakīnah
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: SakinahWidgets/SakinahWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.abdulelmir.sakinah]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abdulelmir.sakinah.watchkitapp.widgets
+        TARGETED_DEVICE_FAMILY: "4"
+        CODE_SIGN_STYLE: Automatic
   # Logic tests: compiles the pure prayer-time files directly (no host app).
   SakinahWatchTests:
     type: bundle.unit-test
@@ -48,6 +84,16 @@ targets:
       - SakinahWatch/Models/Posture.swift
       - SakinahWatch/Services/PrayerEngine.swift
       - SakinahWatch/Services/SettingsStore.swift
+      - SakinahWatch/Services/AlertPlanner.swift
+      - SakinahWatch/Services/SalahTracker.swift
+      - SakinahWatch/Models/SharedSnapshot.swift
+      - SakinahWatch/Models/CalibrationProfile.swift
+      - SakinahWatch/Models/QiblaMath.swift
+      - SakinahWatch/Models/Mosque.swift
+      - SakinahWatch/Models/DuaLibrary.swift
+      - SakinahWatch/Models/Memorisation.swift
+      - SakinahWatch/Resources/Duas.json
+      - SakinahWatch/Models/Records.swift
     dependencies:
       - package: Adhan
     settings:

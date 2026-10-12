@@ -2,6 +2,9 @@ import Foundation
 import WatchKit
 
 final class HapticService {
+    /// Gentle taps instead of strong pulses for the rakah count (still N of them).
+    var gentle = false
+
     enum Cue {
         case lightTick
         case postureChange
@@ -34,11 +37,16 @@ final class HapticService {
         let spacing: TimeInterval = 0.45
         Task { @MainActor in
             for i in 0..<n {
-                WKInterfaceDevice.current().play(.success)
+                WKInterfaceDevice.current().play(self.gentle ? .click : .success)
                 if i < n - 1 {
                     try? await Task.sleep(for: .milliseconds(Int(spacing * 1000)))
                 }
             }
         }
     }
+}
+
+extension HapticService: SalahHaptics {
+    func tick() { play(.lightTick) }
+    func rakahCompleted(_ rakah: Int) { playRakahCount(rakah) }
 }

@@ -5,8 +5,7 @@ import Combine
 /// (Stage 2) reads the same values.
 @MainActor
 final class SettingsStore: ObservableObject {
-    static let appGroup = "group.com.abdulelmir.sakinah"
-    static let key = "prayerSettings.v1"
+    static let key = AppGroup.settingsKey
 
     private let defaults: UserDefaults
 
@@ -14,7 +13,7 @@ final class SettingsStore: ObservableObject {
         didSet { save() }
     }
 
-    init(defaults: UserDefaults = UserDefaults(suiteName: SettingsStore.appGroup) ?? .standard) {
+    init(defaults: UserDefaults = AppGroup.defaults) {
         self.defaults = defaults
         if let data = defaults.data(forKey: Self.key),
            let saved = try? JSONDecoder().decode(PrayerSettings.self, from: data) {

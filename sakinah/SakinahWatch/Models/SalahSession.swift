@@ -35,7 +35,13 @@ enum PrayerName: String, Codable, CaseIterable, Identifiable {
     }
 
     var title: String {
-        rawValue.prefix(1).uppercased() + rawValue.dropFirst()
+        switch self {
+        case .fajr:    return String(localized: "Fajr")
+        case .dhuhr:   return String(localized: "Dhuhr")
+        case .asr:     return String(localized: "Asr")
+        case .maghrib: return String(localized: "Maghrib")
+        case .isha:    return String(localized: "Isha")
+        }
     }
 }
 

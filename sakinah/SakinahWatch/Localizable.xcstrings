@@ -1,0 +1,958 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "Fajr": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الفجر"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fajr"
+          }
+        }
+      }
+    },
+    "Dhuhr": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الظهر"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dhuhr"
+          }
+        }
+      }
+    },
+    "Asr": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "العصر"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asr"
+          }
+        }
+      }
+    },
+    "Maghrib": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "المغرب"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maghrib"
+          }
+        }
+      }
+    },
+    "Isha": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "العشاء"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isha"
+          }
+        }
+      }
+    },
+    "Jumuʿah": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الجمعة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumuʿah"
+          }
+        }
+      }
+    },
+    "Wudu": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الوضوء"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wudu"
+          }
+        }
+      }
+    },
+    "Salah": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الصلاة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salah"
+          }
+        }
+      }
+    },
+    "Qibla": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "القبلة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qibla"
+          }
+        }
+      }
+    },
+    "Mosques": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "المساجد"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mosques"
+          }
+        }
+      }
+    },
+    "Qurʾan": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "القرآن"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qurʾan"
+          }
+        }
+      }
+    },
+    "Duʿas": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الأدعية"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duʿas"
+          }
+        }
+      }
+    },
+    "Adhkar": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الأذكار"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adhkar"
+          }
+        }
+      }
+    },
+    "History": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "السجل"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "History"
+          }
+        }
+      }
+    },
+    "Timetable": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "المواقيت"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timetable"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الإعدادات"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "NEXT PRAYER": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الصلاة القادمة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEXT PRAYER"
+          }
+        }
+      }
+    },
+    "AYAH OF THE HOUR": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "آية الساعة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AYAH OF THE HOUR"
+          }
+        }
+      }
+    },
+    "RAMADAN": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "رمضان"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RAMADAN"
+          }
+        }
+      }
+    },
+    "Awaiting location…": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "بانتظار الموقع…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awaiting location…"
+          }
+        }
+      }
+    },
+    "No prayer due now": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "لا صلاة حاضرة الآن"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No prayer due now"
+          }
+        }
+      }
+    },
+    "Today": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "اليوم"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "Sunrise": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الشروق"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sunrise"
+          }
+        }
+      }
+    },
+    "Night": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الليل"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Night"
+          }
+        }
+      }
+    },
+    "Last third begins": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "بداية الثلث الأخير"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last third begins"
+          }
+        }
+      }
+    },
+    "Prayer times": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "مواقيت الصلاة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer times"
+          }
+        }
+      }
+    },
+    "Method": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "طريقة الحساب"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Method"
+          }
+        }
+      }
+    },
+    "Madhhab": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "المذهب"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Madhhab"
+          }
+        }
+      }
+    },
+    "Alerts": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "التنبيهات"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerts"
+          }
+        }
+      }
+    },
+    "Prayer alerts": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "تنبيهات الصلاة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer alerts"
+          }
+        }
+      }
+    },
+    "Heads-up": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "تنبيه مسبق"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heads-up"
+          }
+        }
+      }
+    },
+    "Calm reminders": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "تذكير بالسكينة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calm reminders"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "متابعة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "Start": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "ابدأ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        }
+      }
+    },
+    "Next": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "التالي"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
+          }
+        }
+      }
+    },
+    "Skip": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "تخطَّ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Done": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "تم"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Review": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "مراجعة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review"
+          }
+        }
+      }
+    },
+    "Tasbih": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "التسبيح"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasbih"
+          }
+        }
+      }
+    },
+    "Tasbih counter": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "عداد التسبيح"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasbih counter"
+          }
+        }
+      }
+    },
+    "After salah": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "بعد الصلاة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After salah"
+          }
+        }
+      }
+    },
+    "Morning and evening": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الصباح والمساء"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morning and evening"
+          }
+        }
+      }
+    },
+    "Favourites": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "المفضلة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favourites"
+          }
+        }
+      }
+    },
+    "Memorise": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "الحفظ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memorise"
+          }
+        }
+      }
+    },
+    "Travel": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "السفر"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Travel"
+          }
+        }
+      }
+    },
+    "Travelling": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "مسافر"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Travelling"
+          }
+        }
+      }
+    },
+    "Privacy mode": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "وضع الخصوصية"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy mode"
+          }
+        }
+      }
+    },
+    "Khushu mode": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "وضع الخشوع"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khushu mode"
+          }
+        }
+      }
+    },
+    "Facing qibla": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "باتجاه القبلة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Facing qibla"
+          }
+        }
+      }
+    },
+    "Gratitude journal": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "دفتر الشكر"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gratitude journal"
+          }
+        }
+      }
+    },
+    "A moment to pause?": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "لحظة سكينة؟"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A moment to pause?"
+          }
+        }
+      }
+    },
+    "Wudu complete": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "اكتمل الوضوء"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wudu complete"
+          }
+        }
+      }
+    },
+    "Ghusl checklist": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "خطوات الغسل"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghusl checklist"
+          }
+        }
+      }
+    },
+    "Another": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "آية أخرى"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another"
+          }
+        }
+      }
+    },
+    "Calibrate motion": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "معايرة الحركة"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calibrate motion"
+          }
+        }
+      }
+    },
+    "Delete all my data": {
+      "comment": "Arabic draft: needs native-speaker review before release.",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "حذف كل بياناتي"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete all my data"
+          }
+        }
+      }
+    }
+  }
+}

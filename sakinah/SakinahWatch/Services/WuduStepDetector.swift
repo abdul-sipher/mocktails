@@ -16,12 +16,6 @@ final class WuduStepDetector: ObservableObject {
     private let haptic: HapticService
     private var task: Task<Void, Never>?
     private var lastGestureAt: Date = .distantPast
-    private var gestureBudget: [WuduStep: Int] = [
-        .handsThrice: 3, .mouthThrice: 3, .noseThrice: 3,
-        .faceThrice: 3, .armsThrice: 3, .feetThrice: 3,
-        .headWipe: 1, .earsWipe: 1
-    ]
-
     init(haptic: HapticService) { self.haptic = haptic }
 
     func start(stream: AsyncStream<MotionService.Sample>) {
@@ -35,7 +29,15 @@ final class WuduStepDetector: ObservableObject {
 
     func stop() { task?.cancel(); task = nil }
 
+    func reset() {
+        currentStep = .niyyah
+        repetitions = 0
+        completed = false
+        lastGestureAt = .distantPast
+    }
+
     func advance() {
+        guard !completed else { return }
         guard let next = WuduStep(rawValue: currentStep.rawValue + 1) else {
             completed = true
             haptic.play(.wuduComplete)
@@ -47,6 +49,7 @@ final class WuduStepDetector: ObservableObject {
     }
 
     private func ingest(_ s: MotionService.Sample) {
+        guard !completed else { return }
         // Niyyah is a still hold — auto-advance after 4 seconds at rest.
         if currentStep == .niyyah {
             if s.userAccelMag < 0.05 && s.rotationMag < 0.3 {
@@ -66,8 +69,7 @@ final class WuduStepDetector: ObservableObject {
             lastGestureAt = now
             repetitions += 1
             haptic.play(.lightTick)
-            let budget = gestureBudget[currentStep] ?? 1
-            if repetitions >= budget { advance() }
+            if repetitions >= currentStep.target { advance() }
         }
     }
 }

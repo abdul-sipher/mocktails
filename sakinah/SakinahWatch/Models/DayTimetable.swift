@@ -79,6 +79,6 @@ struct DayTimetable: Equatable {
 extension PrayerName {
     /// Dhuhr is shown as Jumuʿah on Fridays.
     func displayTitle(isFriday: Bool) -> String {
-        self == .dhuhr && isFriday ? "Jumuʿah" : title
+        self == .dhuhr && isFriday ? String(localized: "Jumuʿah") : title
     }
 }

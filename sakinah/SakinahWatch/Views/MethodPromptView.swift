@@ -10,6 +10,7 @@ struct MethodPromptView: View {
     @State private var method = PrayerSettings.suggestedMethod(regionCode: Locale.current.region?.identifier)
     @State private var madhhab: Madhhab = .shafii
     @State private var asr: AsrSchool = .standard
+    @State private var wrist: Wrist = .left
 
     var body: some View {
         NavigationStack {
@@ -37,10 +38,18 @@ struct MethodPromptView: View {
                 } footer: {
                     Text("Method suggested for your region. Hanafi Asr is later than the standard time.")
                 }
+                Section {
+                    Picker("Watch worn on", selection: $wrist) {
+                        ForEach(Wrist.allCases) { w in Text("\(w.title) wrist").tag(w) }
+                    }
+                } footer: {
+                    Text("Next, Sakīnah asks to send prayer alerts. Location is used only on this watch, for prayer times and nearby mosques.")
+                }
                 Button("Continue") {
                     store.settings.method = method
                     store.settings.madhhab = madhhab
                     store.settings.asr = asr
+                    store.settings.wrist = wrist
                     store.settings.hasChosenMethod = true
                     onDone()
                 }

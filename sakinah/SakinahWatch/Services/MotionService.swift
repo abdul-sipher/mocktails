@@ -24,6 +24,9 @@ final class MotionService {
     private(set) var lastAltitude: Double = 0
     private var continuation: AsyncStream<Sample>.Continuation?
 
+    /// False in the simulator and on hardware without device motion.
+    var isAvailable: Bool { motion.isDeviceMotionAvailable }
+
     func stream() -> AsyncStream<Sample> {
         AsyncStream { continuation in
             self.continuation = continuation

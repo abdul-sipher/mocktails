@@ -87,6 +87,30 @@ struct PrayerSettings: Codable, Equatable {
     var rakahHaptics = true
     var calmReminders = false
     var hasChosenMethod = false
+    /// Notification at the start of each prayer.
+    var prayerAlerts = true
+    /// Heads-up before each prayer, in minutes; 0 = off.
+    var headsUpMinutes = 10
+    /// Name the nearest mosque in the heads-up.
+    var mosqueNudge = true
+    /// Add "make wudu before you leave" to the heads-up when wudu is not marked.
+    var wuduReminder = true
+    /// Buzz once when the Qibla screen lines up.
+    var qiblaHaptic = true
+    /// Days added to the Umm al-Qura Hijri date to match local sighting.
+    var hijriOffset = 0
+    /// Don't keep any record of salah sessions.
+    var privacyMode = false
+    /// Minimal, dim screens during salah.
+    var khushuMode = false
+    /// Save finished salah as mindful minutes in Health (opt-in).
+    var mindfulMinutes = false
+    /// Travelling: Dhuhr, Asr and Isha default to two rakʿāt.
+    var travelling = false
+    /// Daily reminder while prayers are owed.
+    var qadaReminder = false
+    /// Rakah buzzes as gentle taps instead of strong pulses (still N of them).
+    var gentleBuzz = false
 
     static let offsetRange = -30...30
 
@@ -97,6 +121,11 @@ struct PrayerSettings: Codable, Equatable {
     mutating func setOffset(_ minutes: Int, for prayer: PrayerName) {
         let clamped = min(max(minutes, Self.offsetRange.lowerBound), Self.offsetRange.upperBound)
         offsets[prayer.rawValue] = clamped == 0 ? nil : clamped
+    }
+
+    /// Rakʿāt to start with for a prayer, shortened (qasr) when travelling.
+    func defaultRakahs(for prayer: PrayerName) -> Int {
+        travelling && [.dhuhr, .asr, .isha].contains(prayer) ? 2 : prayer.defaultRakahs
     }
 
     /// Method suggested from the device's region; the user confirms it.
@@ -120,6 +149,8 @@ struct PrayerSettings: Codable, Equatable {
     // version, or one that fails to decode, never resets the others.
     private enum CodingKeys: String, CodingKey {
         case method, madhhab, asr, offsets, highLatitude, wrist, rakahHaptics, calmReminders, hasChosenMethod
+        case prayerAlerts, headsUpMinutes, mosqueNudge, wuduReminder, qiblaHaptic, hijriOffset
+        case privacyMode, khushuMode, mindfulMinutes, travelling, qadaReminder, gentleBuzz
     }
 
     init(from decoder: Decoder) throws {
@@ -134,6 +165,18 @@ struct PrayerSettings: Codable, Equatable {
         rakahHaptics = (try? c.decodeIfPresent(Bool.self, forKey: .rakahHaptics)) ?? d.rakahHaptics
         calmReminders = (try? c.decodeIfPresent(Bool.self, forKey: .calmReminders)) ?? d.calmReminders
         hasChosenMethod = (try? c.decodeIfPresent(Bool.self, forKey: .hasChosenMethod)) ?? d.hasChosenMethod
+        prayerAlerts = (try? c.decodeIfPresent(Bool.self, forKey: .prayerAlerts)) ?? d.prayerAlerts
+        headsUpMinutes = (try? c.decodeIfPresent(Int.self, forKey: .headsUpMinutes)) ?? d.headsUpMinutes
+        mosqueNudge = (try? c.decodeIfPresent(Bool.self, forKey: .mosqueNudge)) ?? d.mosqueNudge
+        wuduReminder = (try? c.decodeIfPresent(Bool.self, forKey: .wuduReminder)) ?? d.wuduReminder
+        qiblaHaptic = (try? c.decodeIfPresent(Bool.self, forKey: .qiblaHaptic)) ?? d.qiblaHaptic
+        hijriOffset = (try? c.decodeIfPresent(Int.self, forKey: .hijriOffset)) ?? d.hijriOffset
+        privacyMode = (try? c.decodeIfPresent(Bool.self, forKey: .privacyMode)) ?? d.privacyMode
+        khushuMode = (try? c.decodeIfPresent(Bool.self, forKey: .khushuMode)) ?? d.khushuMode
+        mindfulMinutes = (try? c.decodeIfPresent(Bool.self, forKey: .mindfulMinutes)) ?? d.mindfulMinutes
+        travelling = (try? c.decodeIfPresent(Bool.self, forKey: .travelling)) ?? d.travelling
+        qadaReminder = (try? c.decodeIfPresent(Bool.self, forKey: .qadaReminder)) ?? d.qadaReminder
+        gentleBuzz = (try? c.decodeIfPresent(Bool.self, forKey: .gentleBuzz)) ?? d.gentleBuzz
     }
 }
 

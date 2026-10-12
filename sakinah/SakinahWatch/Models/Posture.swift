@@ -14,42 +14,50 @@ enum Posture: String, Codable, CaseIterable {
 /// Steps of wudu tracked in order.
 enum WuduStep: Int, Codable, CaseIterable, Identifiable {
     case niyyah
-    case handsThrice
-    case mouthThrice
-    case noseThrice
-    case faceThrice
-    case armsThrice
-    case headWipe
-    case earsWipe
-    case feetThrice
+    case hands
+    case mouth
+    case nose
+    case face
+    case rightArm
+    case leftArm
+    case headAndEars
+    case feet
 
     var id: Int { rawValue }
 
     var title: String {
         switch self {
-        case .niyyah:      return "Niyyah"
-        case .handsThrice: return "Hands × 3"
-        case .mouthThrice: return "Mouth × 3"
-        case .noseThrice:  return "Nose × 3"
-        case .faceThrice:  return "Face × 3"
-        case .armsThrice:  return "Arms to elbows × 3"
-        case .headWipe:    return "Wipe head"
-        case .earsWipe:    return "Wipe ears"
-        case .feetThrice:  return "Feet to ankles × 3"
+        case .niyyah:      return "Intention (niyyah)"
+        case .hands:       return "Hands × 3"
+        case .mouth:       return "Rinse mouth × 3"
+        case .nose:        return "Rinse nose × 3"
+        case .face:        return "Face × 3"
+        case .rightArm:    return "Right arm to elbow × 3"
+        case .leftArm:     return "Left arm to elbow × 3"
+        case .headAndEars: return "Wipe head and ears"
+        case .feet:        return "Feet to ankles × 3"
         }
     }
 
     var arabicHint: String {
         switch self {
         case .niyyah:      return "النية"
-        case .handsThrice: return "اليدين"
-        case .mouthThrice: return "المضمضة"
-        case .noseThrice:  return "الاستنشاق"
-        case .faceThrice:  return "الوجه"
-        case .armsThrice:  return "الذراعين"
-        case .headWipe:    return "مسح الرأس"
-        case .earsWipe:    return "مسح الأذنين"
-        case .feetThrice:  return "القدمين"
+        case .hands:       return "اليدين"
+        case .mouth:       return "المضمضة"
+        case .nose:        return "الاستنشاق"
+        case .face:        return "الوجه"
+        case .rightArm:    return "اليد اليمنى"
+        case .leftArm:     return "اليد اليسرى"
+        case .headAndEars: return "مسح الرأس والأذنين"
+        case .feet:        return "القدمين"
+        }
+    }
+
+    /// Washes counted for this step (one hold or wipe, otherwise three).
+    var target: Int {
+        switch self {
+        case .niyyah, .headAndEars: return 1
+        default: return 3
         }
     }
 }

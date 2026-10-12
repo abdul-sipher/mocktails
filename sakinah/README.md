@@ -1,110 +1,116 @@
 # Sakīnah — Islamic Apple Watch Companion
 
-A watchOS app that walks with you through wudu and salah using wrist
-motion, reminds you of Allah when your heart quickens, surfaces an
-ayah for the moment, and points you to the nearest mosque.
+A watch-only watchOS app (watchOS 10+) for prayer times, salah and wudu
+tracking, qibla, nearby mosques, du'as and adhkar. Free. All personal
+data stays on the watch.
 
 > *"Truly, in the remembrance of Allah do hearts find rest."* — Qur'an 13:28
 
-## Features
+Design and decisions: `docs/superpowers/specs/2026-10-12-sakinah-full-app-design.md`.
 
-| Feature | How it works |
-|---|---|
-| Wudu tracker | Detects washing-gesture repetitions via `CMDeviceMotion` and advances through the 9 canonical steps. |
-| Salah tracker | Classifies qiyām / rukūʿ / sujūd / jalsa / tashahhud from wrist gravity + altitude; counts rakʿāt and which sajdah you're in. |
-| Rakah haptic | N `.success` haptics on each completed rakʿah — 1 buzz after the 1st rakah, 2 after the 2nd, and so on. Distinct notification taps for sajdah 1 vs 2. |
-| Dhikr reminder | `HealthKit` HR above rolling baseline + low HRV → suggests a pause for tasbīḥ. |
-| Ayah of the hour | Bundled `Ayat.json` maps verses to hours of the day; refreshes every 30 minutes. |
-| Mosque finder | `MKLocalSearch` query for "mosque" ranked by distance; suggests the nearest when a prayer window opens. |
-| Prayer times | Self-contained astronomical calculation (ISNA default, configurable). |
-
-## Project layout
-
-```
-SakinahWatch/
-├── SakinahWatchApp.swift         # @main, app session, bootstrap tasks
-├── Info.plist                    # usage descriptions, background modes
-├── Models/
-│   ├── Posture.swift             # Posture + WuduStep enums
-│   ├── SalahSession.swift        # PrayerName, SalahSession, PrayerTime
-│   ├── Ayah.swift
-│   └── Mosque.swift
-├── Services/
-│   ├── MotionService.swift       # 50Hz CoreMotion stream + altimeter
-│   ├── SalahPostureDetector.swift
-│   ├── WuduStepDetector.swift
-│   ├── HeartRateService.swift    # HealthKit anchored query
-│   ├── AnxietyDetector.swift     # HR-vs-baseline + HRV heuristic
-│   ├── LocationService.swift
-│   ├── MosqueFinder.swift        # MKLocalSearch
-│   ├── PrayerTimesService.swift  # ISNA astronomical solution
-│   ├── QuranService.swift
-│   └── HapticService.swift       # WKInterfaceDevice cues
-├── Views/
-│   ├── HomeView.swift
-│   ├── WuduView.swift
-│   ├── SalahView.swift           # SalahStartView + SalahLiveView
-│   ├── AyahView.swift
-│   ├── MosqueFinderView.swift
-│   └── DhikrReminderView.swift
-└── Resources/
-    └── Ayat.json                 # hour-tagged verses
-```
-
-## Building in Xcode
+## Building
 
 The Xcode project is generated from `project.yml` with
-[XcodeGen](https://github.com/yonaskolb/XcodeGen); the `.xcodeproj` is
-not committed.
+[XcodeGen](https://github.com/yonaskolb/XcodeGen); the `.xcodeproj` is not committed.
 
 ```sh
 brew install xcodegen
 cd sakinah
-xcodegen                       # writes SakinahWatch.xcodeproj
-open SakinahWatch.xcodeproj    # or build from the command line:
+xcodegen
+open SakinahWatch.xcodeproj        # pick an Apple Watch simulator, press Run
+```
+
+Command line:
+
+```sh
 xcodebuild -project SakinahWatch.xcodeproj -scheme SakinahWatch \
   -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' build
 ```
 
-`project.yml` sets up a watch-only app (watchOS 10+), bundles
-`Resources/Ayat.json`, uses `SakinahWatch/Info.plist` (usage strings,
-`WKWatchOnly`, background modes) and the HealthKit entitlement. To run
-on a real watch, pick your team under **Signing & Capabilities**.
+Targets: `SakinahWatch` (app), `SakinahWidgets` (complications and Smart
+Stack), `SakinahWatchTests` (logic tests), `SakinahWatchUITests`
+(screen walkthrough). In Xcode 27 simulators open in **DeviceHub**
+(Xcode ▸ Open Developer Tool), which replaces the Simulator app.
 
-### Smoke test in the simulator
-
-`SakinahWatchUITests` launches the app, closes the Health prompt, and
-opens Home, Ayah, Wudu (taps Next), Salah (± rakah) and Mosques:
+### Tests
 
 ```sh
-xcrun simctl location <udid> set -33.9205,151.0756   # Lakemba
+xcrun simctl location <udid> set -33.9205,151.0756        # Lakemba
 TEST_RUNNER_SHOT_DIR=/tmp/shots xcodebuild test -project SakinahWatch.xcodeproj \
   -scheme SakinahWatch -destination 'platform=watchOS Simulator,id=<udid>'
 ```
 
-Motion, the barometer and heart rate are not simulated, so posture
-detection, wudu rep counting and the dhikr reminder need a real watch.
+Logic tests cover prayer times against the Adhan library's published
+reference timetables (Makkah, London, Tehran, Dubai, Singapore), Sydney
+daylight saving, Adelaide's half-hour zone, Oslo midsummer, prayer
+windows, alert planning, the salah tracker, calibration maths, qibla,
+mosque merging, du'a content completeness, memorisation, Hijri/Ramadan
+dates and records. The UI test opens every screen.
 
-## Calibration notes
+## What is implemented
 
-The posture detector in `SalahPostureDetector.swift` uses first-pass
-gravity and altitude thresholds assuming the watch is worn on the
-**left wrist** with the digital crown facing the user's hand (Apple's
-default "orient right" setting with the watch on the left). If you
-wear it differently, flip the sign on `gravityY` comparisons or add
-a settings toggle.
+| Area | What works |
+|---|---|
+| Prayer times | Adhan 1.5 (MIT). Methods: MWL, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Moonsighting Committee, Kuwait, Qatar, Singapore, Tehran, Turkey. Asr standard/Hanafi set separately from madhhab. Per-prayer minute offsets. High-latitude rule. Recalculates on change. |
+| Home | Next prayer + countdown, current prayer window (no window sunrise→Dhuhr; Isha "best before" midnight), today's five times, Jumuʿah on Fridays, Hijri date, Ramadan suhoor/iftar card, nearest mosque, mosque nudge in the 10 minutes before a prayer, wudu status. |
+| Timetable | Five prayers, sunrise, makruh periods (approximate), last third of the night. |
+| Alerts | Prayer-time notifications and an optional heads-up (5–20 min) naming the nearest mosque and reminding to make wudu; 3 days scheduled ahead, refreshed in the background. Qada reminder (opt-in). |
+| Watch face | WidgetKit complications (circular, corner, inline, rectangular) and Smart Stack: next prayer with countdown; nearest mosque. |
+| Salah | Tap-to-count tracker (one tap per sajdah; N buzzes after rakah N), pause, finish, undo, ± correction, post-prayer review, adhkar after salah, any length, seated prayer, travel (qasr) defaults, khushu mode. Motion counting is **experimental**: confidence shown, holds when unsure, either wrist, personal calibration, workout session keeps sensors awake. |
+| Wudu | Guided steps (right/left arm separate), experimental motion counting with manual Next, "I have wudu" status set only by the user, ghusl checklist with sources. |
+| Qibla | Large compass, bearing from true north, heading (true or magnetic, labelled), shortest turn, aligned state + optional haptic, distance to Makkah, accuracy warnings, no-compass fallback. |
+| Mosques | Apple Maps search (mosque, masjid, musalla, Islamic centre), walking and driving ETAs, directions in Maps, favourites, home/work, saved results with date, "Can I make it?". |
+| Du'as | 27 du'as in 10 categories: Arabic, transliteration, meaning, source, excerpt flag, favourites. |
+| Adhkar | After-salah and morning/evening sets with tap counters; tasbih on the Digital Crown. |
+| Qur'an | Time-of-day verse (labelled a suggestion), memorisation goals for Al-Fatihah and Juz ʿAmma with streak and revision. |
+| Wellbeing | Calm reminders, off by default: heart rate above baseline with low HRV, not while walking/running, not during salah or khushu mode, 15-minute cooldown, rotating sourced texts, "helpful / not helpful" feedback that makes reminders less eager. |
+| Records | Prayer history, qada count, full-day streak, gratitude journal, privacy mode, mindful minutes in Health (opt-in), delete all data. |
+| Accessibility | VoiceOver labels on custom controls, reduced motion respected, Arabic shown right-to-left; Arabic UI strings drafted for the main screens. |
 
-A proper deployment would record a short calibration session per user
-(stand-bow-prostrate three times) and fit the thresholds to the
-samples rather than hard-coding them.
+## Permissions
+
+| Permission | When asked | Why |
+|---|---|---|
+| Location (when in use) | First launch | Prayer times, qibla, nearby mosques |
+| Notifications | After choosing the calculation method | Prayer alerts |
+| Health: heart rate, HRV (read) | Only when calm reminders are switched on | Calm reminders |
+| Health: workouts (write) | First automatic-motion salah | Keeps the watch awake during salah; no workout is saved |
+| Health: mindful minutes (write) | Only when that setting is switched on | Logs salah time |
+| Motion | First motion-counting use | Wudu and salah motion counting, calibration |
+
+## Not supported (and why)
+
+- **Silencing notifications or turning on Focus during salah:** no public API.
+- **Iqamah and Jumuʿah congregation times:** Apple Maps does not have them and there is no verified source yet. Shown as "Not available", never guessed.
+- **Recitation audio:** none in v1 (licensing).
+- **iPhone companion:** planned after the watch app; nothing here requires an iPhone.
+- **Continuous background heart-rate monitoring:** watchOS only delivers heart rate when the system samples it; calm reminders work when samples arrive, which is not guaranteed outside workouts.
+
+## Needs a real Apple Watch to verify
+
+Posture and rakah detection, calibration, wudu motion counting, heart
+rate and HRV (calm reminders), compass heading and accuracy, haptic
+patterns (N buzzes, gentle taps, qibla buzz), workout session keeping the
+app awake, background refresh, complications on a real watch face. The
+simulator has no motion, heart-rate or compass sensors.
+
+## Before App Store release
+
+- **Scholar review:** `SakinahWatch/Resources/Duas.json` (all du'as and
+  adhkar), ghusl checklist, travel guidance, makruh-period minutes, Isha
+  "best before midnight", default Asr per madhhab.
+- **Native Arabic review:** `SakinahWatch/Localizable.xcstrings` (marked needs review).
+- **Translation licence:** the English in `Resources/Ayat.json` matches
+  Sahih International; get permission or replace it. Du'a meanings are
+  Sakīnah's own wording.
+- **App icon:** `Assets.xcassets/AppIcon.appiconset` is a placeholder.
+- **Signing:** set your team; App Group `group.com.abdulelmir.sakinah`
+  and HealthKit capability must exist on the Apple Developer account.
+- **Privacy policy URL** (required for HealthKit apps) and App Store
+  privacy answers: no data collected (`PrivacyInfo.xcprivacy`).
 
 ## Privacy
 
-- All motion, HR, and location processing happens on-device.
-- No network calls except `MKLocalSearch` (Apple Maps) for mosque lookup.
-- `HealthKit` reads are opt-in; the anxiety detector can be turned off.
-
-## Web prototype
-
-`../watch-prototype.html` is a click-through of the watch faces for
-design review — open it in a browser, no build needed.
+On-device only. No accounts, analytics or network calls except Apple
+Maps search and routing. Raw sensor data is never stored; calibration
+keeps only four averaged wrist positions.

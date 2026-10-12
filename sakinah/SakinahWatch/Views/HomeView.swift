@@ -10,9 +10,19 @@ struct HomeView: View {
                     if session.mosqueNudgeActive, let next = session.nextPrayer, let mosque = session.nearestMosque {
                         MosqueNudgeCard(next: next, mosque: mosque)
                     }
+                    Text(HijriDate.string(for: Date(), offsetDays: session.settings.settings.hijriOffset))
+                        .font(.caption2).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if HijriDate.isRamadan(Date(), offsetDays: session.settings.settings.hijriOffset),
+                       let t = session.timetable {
+                        RamadanCard(timetable: t)
+                    }
                     NextPrayerCard()
                     if let timetable = session.timetable, let next = session.nextPrayer {
                         TodayStrip(timetable: timetable, next: next)
+                    }
+                    if let since = session.wuduSince {
+                        WuduChip(since: since) { session.setWudu(false) }
                     }
                     AyahCard(ayah: session.currentAyah)
                     TileGrid()
@@ -26,7 +36,10 @@ struct HomeView: View {
         .sheet(item: $session.activeSheet) { sheet in
             switch sheet {
             case .methodPrompt:
-                MethodPromptView(store: session.settings) { session.activeSheet = nil }
+                MethodPromptView(store: session.settings) {
+                    session.activeSheet = nil
+                    Task { await session.prepareAlerts() }
+                }
             case .dhikr:
                 DhikrReminderView()
             }
@@ -71,8 +84,12 @@ private struct TileGrid: View {
         LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 8) {
             NavigationLink { WuduView() } label: { Tile(title: "Wudu", systemImage: "drop.fill", tint: .teal) }
             NavigationLink { SalahStartView() } label: { Tile(title: "Salah", systemImage: "figure.stand", tint: .green) }
-            NavigationLink { AyahView() } label: { Tile(title: "Ayah", systemImage: "text.book.closed.fill", tint: .indigo) }
+            NavigationLink { AyahView() } label: { Tile(title: "Qurʾan", systemImage: "text.book.closed.fill", tint: .indigo) }
+            NavigationLink { DuaLibraryView() } label: { Tile(title: "Duʿas", systemImage: "hands.and.sparkles.fill", tint: .mint) }
+            NavigationLink { AdhkarHubView() } label: { Tile(title: "Adhkar", systemImage: "circle.dotted", tint: .green) }
             NavigationLink { MosqueFinderView() } label: { Tile(title: "Mosques", systemImage: "mappin.and.ellipse", tint: .orange) }
+            NavigationLink { QiblaView() } label: { Tile(title: "Qibla", systemImage: "location.north.line.fill", tint: Color(red: 0.85, green: 0.7, blue: 0.3)) }
+            NavigationLink { HistoryView() } label: { Tile(title: "History", systemImage: "checklist", tint: .teal) }
             NavigationLink { TimetableView() } label: { Tile(title: "Timetable", systemImage: "clock.fill", tint: .cyan) }
             NavigationLink { SettingsView(store: session.settings) } label: { Tile(title: "Settings", systemImage: "gearshape.fill", tint: .gray) }
         }
@@ -88,7 +105,7 @@ private struct Tile: View {
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: systemImage).font(.title3).foregroundStyle(tint)
-            Text(title).font(.footnote.weight(.medium))
+            Text(LocalizedStringKey(title)).font(.footnote.weight(.medium))
         }
         .frame(maxWidth: .infinity, minHeight: 56)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
@@ -200,5 +217,47 @@ private struct MosqueSuggestionCard: View {
             }
             .buttonStyle(.plain)
         )
+    }
+}
+
+/// Shown while the user has marked that they have wudu.
+private struct WuduChip: View {
+    let since: Date
+    let clear: () -> Void
+
+    var body: some View {
+        HStack {
+            Image(systemName: "drop.fill").foregroundStyle(.teal)
+            Text("Wudu marked \(since.formatted(date: .omitted, time: .shortened))").font(.caption2)
+            Spacer()
+            Button("Clear", action: clear).font(.caption2).buttonStyle(.plain).foregroundStyle(.teal)
+        }
+        .padding(8)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+/// Suhoor ends at Fajr; iftar at Maghrib. Counts down to whichever is next.
+private struct RamadanCard: View {
+    let timetable: DayTimetable
+
+    var body: some View {
+        let now = Date()
+        let iftarNext = now >= timetable.fajr && now < timetable.maghrib
+        let target = iftarNext ? timetable.maghrib : (now < timetable.fajr ? timetable.fajr : timetable.nextFajr)
+        VStack(alignment: .leading, spacing: 2) {
+            Text("RAMADAN").font(.caption2).foregroundStyle(.secondary).tracking(2)
+            HStack {
+                Text(iftarNext ? "Iftar" : "Suhoor ends").font(.headline)
+                Spacer()
+                Text(target, style: .time).font(.headline.monospacedDigit())
+            }
+            Text(target, style: .relative).font(.caption2).foregroundStyle(.secondary)
+            Text(iftarNext ? "At Maghrib" : "At Fajr. Many timetables stop eating a few minutes earlier.")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(red: 0.85, green: 0.7, blue: 0.3).opacity(0.18), in: RoundedRectangle(cornerRadius: 12))
     }
 }
