@@ -7,6 +7,10 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
+packages:
+  Adhan:
+    url: https://github.com/batoulapps/adhan-swift
+    exactVersion: 1.5.0
 targets:
   SakinahWatch:
     type: application
@@ -15,11 +19,14 @@ targets:
       - path: SakinahWatch
         excludes:
           - Info.plist
+    dependencies:
+      - package: Adhan
     entitlements:
       path: SakinahWatch/SakinahWatch.entitlements
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
+        com.apple.security.application-groups: [group.com.abdulelmir.sakinah]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abdulelmir.sakinah.watchkitapp
@@ -29,6 +36,24 @@ targets:
         TARGETED_DEVICE_FAMILY: "4"
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
+  # Logic tests: compiles the pure prayer-time files directly (no host app).
+  SakinahWatchTests:
+    type: bundle.unit-test
+    platform: watchOS
+    sources:
+      - SakinahWatchTests
+      - SakinahWatch/Models/PrayerSettings.swift
+      - SakinahWatch/Models/DayTimetable.swift
+      - SakinahWatch/Models/SalahSession.swift
+      - SakinahWatch/Models/Posture.swift
+      - SakinahWatch/Services/PrayerEngine.swift
+      - SakinahWatch/Services/SettingsStore.swift
+    dependencies:
+      - package: Adhan
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.abdulelmir.sakinah.tests
   SakinahWatchUITests:
     type: bundle.ui-testing
     platform: watchOS
@@ -48,4 +73,4 @@ schemes:
     run:
       config: Debug
     test:
-      targets: [SakinahWatchUITests]
+      targets: [SakinahWatchTests, SakinahWatchUITests]
