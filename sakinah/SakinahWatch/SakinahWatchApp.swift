@@ -258,7 +258,10 @@ final class AppSession: ObservableObject {
     private func refreshPrayerWindow() async {
         while !Task.isCancelled {
             recomputePrayerTimes()
-            try? await Task.sleep(for: .seconds(30))
+            // Every 30 s, but wake exactly as the next prayer begins so
+            // Home never shows a prayer that has already started as "next".
+            let untilNext = nextPrayer.map { $0.date.timeIntervalSinceNow + 0.5 } ?? 30
+            try? await Task.sleep(for: .seconds(max(0.5, min(30, untilNext))))
         }
     }
 
