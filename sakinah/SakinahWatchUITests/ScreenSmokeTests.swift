@@ -37,6 +37,25 @@ final class ScreenSmokeTests: XCTestCase {
 
         open("Mosques"); sleep(5); shot("5-mosques"); back()
 
+        // Timetable shows sunrise; changing the method in Settings moves Fajr.
+        open("Timetable"); shot("6-timetable")
+        XCTAssertTrue(app.staticTexts["Sunrise"].waitForExistence(timeout: 5))
+        let fajrBefore = fajrLabel()
+        back()
+
+        open("Settings"); shot("7-settings")
+        app.staticTexts["Method"].firstMatch.tap()
+        sleep(2); shot("7a-method-list")
+        let egyptian = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label BEGINSWITH 'Egyptian'")).firstMatch
+        for _ in 0..<8 where !(egyptian.exists && egyptian.isHittable) { app.swipeUp(); sleep(1) }
+        egyptian.tap()
+        sleep(1); shot("7b-settings-egyptian"); back()
+
+        open("Timetable")
+        XCTAssertNotEqual(fajrLabel(), fajrBefore, "changing method recalculates Fajr")
+        back()
+
         XCTAssertEqual(app.state, .runningForeground, "app still running")
     }
 
@@ -64,7 +83,7 @@ final class ScreenSmokeTests: XCTestCase {
 
     private func clearPrompts() {
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.Carousel")
-        for pass in 0..<4 {
+        for _ in 0..<4 {
             sleep(3)
             for label in ["Allow While Using App", "Allow Once", "Allow"] {
                 let b = springboard.buttons[label]
@@ -72,12 +91,20 @@ final class ScreenSmokeTests: XCTestCase {
                 let a = app.buttons[label]
                 if a.exists { a.tap() }
             }
-            // HealthKit sheet is a system overlay outside the app's element
-            // tree: tap its X by position. The app continues without HR.
-            if pass == 0 {
-                app.coordinate(withNormalizedOffset: CGVector(dx: 0.16, dy: 0.15)).tap()
+            // First launch asks for the calculation method.
+            if app.staticTexts["Prayer times"].exists || app.buttons["Continue"].exists {
+                shot("0-method-prompt")
+                let cont = app.buttons["Continue"]
+                for _ in 0..<8 where !(cont.exists && cont.isHittable) { app.swipeUp() }
+                cont.tap()
             }
         }
+    }
+
+    private func fajrLabel() -> String {
+        let fajr = app.staticTexts.matching(identifier: "time-fajr").firstMatch
+        if fajr.waitForExistence(timeout: 3) { return fajr.label }
+        return app.otherElements["row-fajr"].label
     }
 
     private func shot(_ name: String) {

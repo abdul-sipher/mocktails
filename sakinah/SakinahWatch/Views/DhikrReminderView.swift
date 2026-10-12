@@ -21,7 +21,7 @@ struct DhikrReminderView: View {
             }
             .padding(.top, 4)
 
-            Button("Alhamdulillah") { session.dhikrReminderActive = false }
+            Button("Alhamdulillah") { session.activeSheet = nil }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
         }

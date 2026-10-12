@@ -23,7 +23,7 @@ final class AnxietyDetector {
 
     func stream(using heart: HeartRateService) -> AsyncStream<Signal> {
         AsyncStream { continuation in
-            Task {
+            let reader = Task {
                 var rolling: [Double] = []
                 for await reading in heart.stream() {
                     rolling.append(reading.bpm)
@@ -45,6 +45,8 @@ final class AnxietyDetector {
                     }
                 }
             }
+            // Switching calm reminders off ends the stream; stop reading HR too.
+            continuation.onTermination = { _ in reader.cancel() }
         }
     }
 }

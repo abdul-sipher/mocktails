@@ -4,6 +4,8 @@ import CoreLocation
 final class LocationService: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     private var continuation: AsyncStream<CLLocationCoordinate2D>.Continuation?
+    /// Called with `true` when location access is denied or restricted.
+    var onAuthorizationChange: ((Bool) -> Void)?
 
     override init() {
         super.init()
@@ -32,4 +34,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ m: CLLocationManager, didFailWithError error: Error) { }
+
+    func locationManagerDidChangeAuthorization(_ m: CLLocationManager) {
+        let status = m.authorizationStatus
+        onAuthorizationChange?(status == .denied || status == .restricted)
+    }
 }

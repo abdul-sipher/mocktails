@@ -10,7 +10,10 @@ struct HomeView: View {
                     if session.mosqueNudgeActive, let next = session.nextPrayer, let mosque = session.nearestMosque {
                         MosqueNudgeCard(next: next, mosque: mosque)
                     }
-                    NextPrayerCard(next: session.nextPrayer)
+                    NextPrayerCard()
+                    if let timetable = session.timetable, let next = session.nextPrayer {
+                        TodayStrip(timetable: timetable, next: next)
+                    }
                     AyahCard(ayah: session.currentAyah)
                     TileGrid()
                     MosqueSuggestionCard(mosque: session.nearestMosque)
@@ -20,8 +23,13 @@ struct HomeView: View {
             }
             .navigationTitle("Sakīnah")
         }
-        .sheet(isPresented: $session.dhikrReminderActive) {
-            DhikrReminderView()
+        .sheet(item: $session.activeSheet) { sheet in
+            switch sheet {
+            case .methodPrompt:
+                MethodPromptView(store: session.settings) { session.activeSheet = nil }
+            case .dhikr:
+                DhikrReminderView()
+            }
         }
     }
 }
@@ -57,12 +65,16 @@ private struct MosqueNudgeCard: View {
 }
 
 private struct TileGrid: View {
+    @EnvironmentObject var session: AppSession
+
     var body: some View {
         LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 8) {
             NavigationLink { WuduView() } label: { Tile(title: "Wudu", systemImage: "drop.fill", tint: .teal) }
             NavigationLink { SalahStartView() } label: { Tile(title: "Salah", systemImage: "figure.stand", tint: .green) }
             NavigationLink { AyahView() } label: { Tile(title: "Ayah", systemImage: "text.book.closed.fill", tint: .indigo) }
             NavigationLink { MosqueFinderView() } label: { Tile(title: "Mosques", systemImage: "mappin.and.ellipse", tint: .orange) }
+            NavigationLink { TimetableView() } label: { Tile(title: "Timetable", systemImage: "clock.fill", tint: .cyan) }
+            NavigationLink { SettingsView(store: session.settings) } label: { Tile(title: "Settings", systemImage: "gearshape.fill", tint: .gray) }
         }
         .buttonStyle(.plain)
     }
@@ -84,24 +96,62 @@ private struct Tile: View {
 }
 
 private struct NextPrayerCard: View {
-    let next: PrayerTime?
+    @EnvironmentObject var session: AppSession
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("NEXT PRAYER").font(.caption2).foregroundStyle(.secondary).tracking(2)
-            if let next {
+            if let next = session.nextPrayer {
                 HStack {
-                    Text(next.name.title).font(.headline)
+                    Text(next.name.displayTitle(isFriday: session.timetable?.isFriday == true && Calendar.current.isDateInToday(next.date)))
+                        .font(.headline)
                     Spacer()
                     Text(next.date, style: .time).font(.headline.monospacedDigit())
                 }
                 Text(next.date, style: .relative).font(.caption2).foregroundStyle(.secondary)
+                Text(windowLine).font(.caption2).foregroundStyle(.green)
+            } else if session.locationDenied {
+                Text("Location is off for Sakīnah. Turn it on in the Watch app ▸ Privacy ▸ Location to see prayer times.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            } else if session.timesUnavailable {
+                Text("Times unavailable today at this latitude. Change the high-latitude rule in Settings.")
+                    .font(.footnote).foregroundStyle(.secondary)
             } else {
                 Text("Awaiting location…").font(.footnote).foregroundStyle(.secondary)
             }
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var windowLine: String {
+        guard let w = session.currentWindow else { return "No prayer due now" }
+        let end = (w.preferredEnd ?? w.end).formatted(date: .omitted, time: .shortened)
+        let name = w.prayer.title
+        return w.preferredEnd == nil ? "\(name) time until \(end)" : "\(name) time, best before \(end)"
+    }
+}
+
+/// Today's five prayers; the next one highlighted.
+private struct TodayStrip: View {
+    let timetable: DayTimetable
+    let next: PrayerTime
+
+    var body: some View {
+        VStack(spacing: 3) {
+            ForEach(timetable.prayers, id: \.name) { p in
+                HStack {
+                    Text(p.name.displayTitle(isFriday: timetable.isFriday))
+                    Spacer()
+                    Text(p.date, style: .time).monospacedDigit()
+                }
+                .font(.caption.weight(p.date == next.date ? .bold : .regular))
+                .foregroundStyle(p.date == next.date ? Color.green : (p.date < Date() ? Color.secondary : Color.primary))
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .padding(10)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 }
